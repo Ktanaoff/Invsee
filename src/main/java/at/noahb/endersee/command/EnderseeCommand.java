@@ -1,4 +1,4 @@
-package at.noahb.invsee.command;
+package at.noahb.endersee.command;
 
 import at.noahb.common.InvseePlugin;
 import net.kyori.adventure.text.Component;
@@ -10,15 +10,15 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
-public class InvseeCommand extends Command {
+public class EnderseeCommand extends Command {
 
     protected final InvseePlugin instance;
 
-    public InvseeCommand(InvseePlugin instance) {
+    public EnderseeCommand(InvseePlugin instance) {
         super(
-                "invsee",
-                "Invsee command",
-                "/invsee player",
+                "endersee",
+                "Endersee command",
+                "/endersee player",
                 new ArrayList<>()
         );
         this.instance = instance;
@@ -28,7 +28,7 @@ public class InvseeCommand extends Command {
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
         if (args.length != 1) {
-            sender.sendMessage(Component.text("/invsee <player>"));
+            sender.sendMessage(Component.text("/endersee <player>"));
             return true;
         }
 
@@ -37,14 +37,14 @@ public class InvseeCommand extends Command {
             return true;
         }
 
-        if (!player.hasPermission("invsee.invsee.command")) {
+        if (!player.hasPermission("invsee.endersee.command")) {
             sender.sendMessage("You don't have permissions to use that command");
         }
 
         OfflinePlayer other = instance.getServer().getOfflinePlayer(args[0]);
 
         if (other instanceof Player) {
-            instance.getInvseeSessionManager().addSubscriberToSession(other, player.getUniqueId());
+            instance.getEnderseeSessionManager().addSubscriberToSession(other, player.getUniqueId());
             return true;
         }
 

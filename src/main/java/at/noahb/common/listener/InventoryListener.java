@@ -1,6 +1,6 @@
-package at.noahb.invsee.listener;
+package at.noahb.common.listener;
 
-import at.noahb.invsee.Invsee;
+import at.noahb.common.InvseePlugin;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -11,11 +11,12 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
 
-public record InventoryListener(Invsee instance) implements Listener {
+public record InventoryListener(InvseePlugin instance) implements Listener {
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        instance.getSessionManager().removeSubscriberFromSession(event.getPlayer());
+        instance.getInvseeSessionManager().removeSubscriberFromSession(event.getPlayer());
+        instance.getEnderseeSessionManager().removeSubscriberFromSession(event.getPlayer());
     }
 
     @EventHandler
@@ -41,8 +42,8 @@ public record InventoryListener(Invsee instance) implements Listener {
 
     private void handle(LivingEntity entity) {
         if (entity instanceof Player player) {
-
-            player.getScheduler().run(instance, scheduledTask -> instance.getSessionManager().updateContent(player), null);
+            player.getScheduler().run(instance, scheduledTask -> instance.getInvseeSessionManager().updateContent(player), null);
+            player.getScheduler().run(instance, scheduledTask -> instance.getEnderseeSessionManager().updateContent(player), null);
         }
     }
 }

@@ -1,6 +1,6 @@
 name: Invsee
 version: '${version}'
-main: at.noahb.invsee.Invsee
+main: at.noahb.common.InvseePlugin
 api-version: '1.20'
 folia-supported: true
 depend:

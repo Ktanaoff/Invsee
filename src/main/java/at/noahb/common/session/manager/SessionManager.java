@@ -1,5 +1,7 @@
-package at.noahb.invsee;
+package at.noahb.common.session.manager;
 
+import at.noahb.common.InvseePlugin;
+import at.noahb.common.session.Session;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -11,28 +13,28 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-public class SessionManager {
-
+public abstract class SessionManager {
     private final Set<Session> sessions = new HashSet<>();
-    private final Invsee instance;
 
-    public SessionManager(Invsee instance) {
+    private final InvseePlugin instance;
+
+    public SessionManager(InvseePlugin instance) {
         this.instance = instance;
     }
 
     public Set<UUID> getSubscribers(OfflinePlayer player) {
-        return sessions.stream().filter(session -> player.getUniqueId().equals(session.getUuid())).findFirst().orElse(new Session(player)).getSubscribers();
+        return sessions.stream().filter(session -> player.getUniqueId().equals(session.getUuid())).findFirst().orElse(createSession(player)).getSubscribers();
     }
 
     public void addSubscriberToSession(OfflinePlayer player, UUID subscriber) {
         sessions.stream()
                 .filter(filterSession -> player.getUniqueId().equals(filterSession.getUuid()))
                 .findFirst()
-                .ifPresentOrElse(session -> session.addSubscriber(subscriber), () -> sessions.add(new Session(player, subscriber)));
+                .ifPresentOrElse(session -> session.addSubscriber(subscriber), () -> createSession(player, subscriber));
     }
 
     public void removeSubscriberFromSession(@NotNull HumanEntity subscriber) {
-        Optional<Session> first = sessions.stream().filter(session -> session.getSubscribers().contains(subscriber.getUniqueId())).findFirst();
+        Optional<? extends Session> first = sessions.stream().filter(session -> session.getSubscribers().contains(subscriber.getUniqueId())).findFirst();
 
         first.ifPresent(session -> {
             session.removeSubscriber(subscriber.getUniqueId());
@@ -45,11 +47,12 @@ public class SessionManager {
     }
 
     public void updateContent(Player player) {
-        Optional<Session> optionalSession = sessions.stream()
+        Optional<? extends Session> optionalSession = sessions.stream()
                 .filter(session -> session.getUuid().equals(player.getUniqueId()))
                 .findFirst();
 
         if (optionalSession.isPresent()) {
+            System.out.println("w");
             optionalSession.get().updateSpectatorInventory();
             return;
         }
@@ -57,7 +60,17 @@ public class SessionManager {
         optionalSession = sessions.stream()
                 .filter(session -> session.hasSubscriber(player.getUniqueId()))
                 .findFirst();
+        System.out.println("a");
 
         optionalSession.ifPresent(Session::updatePlayerInventory);
     }
+
+    protected void addSession(Session session) {
+        sessions.add(session);
+    }
+
+    protected abstract Session createSession(OfflinePlayer offlinePlayer, UUID subscriber);
+
+    protected abstract Session createSession(OfflinePlayer offlinePlayer);
+
 }

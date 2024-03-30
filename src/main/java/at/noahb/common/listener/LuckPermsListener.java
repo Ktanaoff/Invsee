@@ -1,6 +1,6 @@
-package at.noahb.invsee.listener;
+package at.noahb.common.listener;
 
-import at.noahb.invsee.Invsee;
+import at.noahb.common.InvseePlugin;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.event.node.NodeRemoveEvent;
@@ -10,9 +10,9 @@ import org.bukkit.entity.Player;
 
 public class LuckPermsListener {
 
-    private final Invsee instance;
+    private final InvseePlugin instance;
 
-    public LuckPermsListener(Invsee instance, LuckPerms luckPerms) {
+    public LuckPermsListener(InvseePlugin instance, LuckPerms luckPerms) {
         this.instance = instance;
 
         EventBus eventBus = luckPerms.getEventBus();
@@ -26,7 +26,7 @@ public class LuckPermsListener {
                 OfflinePlayer offlinePlayer = instance.getServer().getOfflinePlayer(((User) nodeRemoveEvent.getTarget()).getUniqueId());
 
                 if (offlinePlayer instanceof Player player) {
-                    instance.getSessionManager().removeSubscriberFromSession(player);
+                    instance.getInvseeSessionManager().removeSubscriberFromSession(player);
                 }
 
             }

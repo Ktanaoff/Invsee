@@ -1,5 +1,7 @@
-package at.noahb.invsee;
+package at.noahb.invsee.session;
 
+import at.noahb.common.InvseePlugin;
+import at.noahb.common.session.Session;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -15,8 +17,10 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static net.kyori.adventure.text.Component.text;
 
-public class Session {
+
+public class InvseeSession implements Session {
 
     private final UUID uuid;
 
@@ -26,21 +30,21 @@ public class Session {
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final ReentrantLock lock = new ReentrantLock();
 
-    public Session(OfflinePlayer player) {
-        this.uuid = player.getUniqueId();
+    public InvseeSession(OfflinePlayer offlinePlayer) {
+        this.uuid = offlinePlayer.getUniqueId();
         this.subscribers = new HashSet<>();
 
-        //todo remove this if holder is not needed
-        if (player instanceof Player onlinePlayer) {
-            this.inventory = Bukkit.createInventory(onlinePlayer, 45);
+        if (offlinePlayer instanceof Player player) {
+            this.inventory = Bukkit.createInventory(player, 45, player.name().append(text("'s inventory")));
         } else {
-            this.inventory = Invsee.getInstance().getServer().createInventory(null, 45);
+            String name = offlinePlayer.getName() == null ? "unknown" : offlinePlayer.getName();
+            this.inventory = InvseePlugin.getInstance().getServer().createInventory(null, 45, text(name).append(text("'s inventory")));
         }
 
         updateSpectatorInventory();
     }
 
-    public Session(OfflinePlayer player, UUID subscriber) {
+    public InvseeSession(OfflinePlayer player, UUID subscriber) {
         this(player);
         addSubscriber(subscriber);
     }
@@ -58,15 +62,16 @@ public class Session {
     }
 
     public void addSubscriber(UUID subscriber) {
+        if (subscriber == null) return;
         if (subscribers.contains(subscriber)) return;
-        Player player = Invsee.getInstance().getServer().getPlayer(subscriber);
+        Player player = InvseePlugin.getInstance().getServer().getPlayer(subscriber);
         if (player == null) return;
 
-        Player other = Invsee.getInstance().getServer().getPlayer(uuid);
+        Player other = InvseePlugin.getInstance().getServer().getPlayer(uuid);
         if (other == null) return;
 
         subscribers.add(subscriber);
-        player.getScheduler().run(Invsee.getInstance(), scheduledTask -> player.openInventory(inventory), null);
+        player.getScheduler().run(InvseePlugin.getInstance(), scheduledTask -> player.openInventory(inventory), null);
     }
 
     public void removeSubscriber(UUID subscriber) {
@@ -100,17 +105,18 @@ public class Session {
     }
 
     public void updatePlayerInventory() {
-        OfflinePlayer offlinePlayer = Invsee.getInstance().getServer().getOfflinePlayer(uuid);
+        OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(uuid);
 
         if (offlinePlayer instanceof Player player) {
-            PlayerInventory playerInventory = player.getInventory();
             if (!lock.tryLock()) {
                 System.out.println("No lock updatePlayerInv");
                 executorService.submit(this::updatePlayerInventory);
             }
+            PlayerInventory playerInventory = player.getInventory();
+
             System.out.println("lock player");
             for (int i = 0; i <= 40; i++) {
-                playerInventory.setItem(i, inventory.getItem(i));
+                playerInventory.setItem(i, this.inventory.getItem(i));
             }
 
             lock.unlock();
@@ -121,7 +127,7 @@ public class Session {
     public boolean equals(Object object) {
         if (this == object) return true;
         if (object == null || getClass() != object.getClass()) return false;
-        Session session = (Session) object;
+        InvseeSession session = (InvseeSession) object;
         return Objects.equals(uuid, session.uuid);
     }
 
