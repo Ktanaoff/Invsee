@@ -39,6 +39,7 @@ public class EnderseeCommand extends Command {
 
         if (!player.hasPermission("invsee.endersee.command")) {
             sender.sendMessage("You don't have permissions to use that command");
+            return true;
         }
 
         OfflinePlayer other = instance.getServer().getOfflinePlayer(args[0]);
