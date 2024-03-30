@@ -1,11 +1,11 @@
-package at.noahb.common;
+package at.noahb.invsee;
 
-import at.noahb.common.listener.InventoryListener;
-import at.noahb.common.listener.LuckPermsListener;
-import at.noahb.endersee.command.EnderseeCommand;
-import at.noahb.endersee.session.manager.EnderseeSessionManager;
-import at.noahb.invsee.command.InvseeCommand;
-import at.noahb.invsee.session.manager.InvseeSessionManager;
+import at.noahb.invsee.common.listener.InventoryListener;
+import at.noahb.invsee.common.listener.LuckPermsListener;
+import at.noahb.invsee.endersee.command.EnderseeCommand;
+import at.noahb.invsee.endersee.session.manager.EnderseeSessionManager;
+import at.noahb.invsee.invsee.command.InvseeCommand;
+import at.noahb.invsee.invsee.session.manager.InvseeSessionManager;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;

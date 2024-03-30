@@ -1,8 +1,8 @@
-package at.noahb.invsee.session.manager;
+package at.noahb.invsee.invsee.session.manager;
 
-import at.noahb.common.InvseePlugin;
-import at.noahb.common.session.manager.SessionManager;
-import at.noahb.invsee.session.InvseeSession;
+import at.noahb.invsee.InvseePlugin;
+import at.noahb.invsee.common.session.manager.SessionManager;
+import at.noahb.invsee.invsee.session.InvseeSession;
 import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;

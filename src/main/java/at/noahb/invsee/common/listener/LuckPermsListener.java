@@ -1,6 +1,6 @@
-package at.noahb.common.listener;
+package at.noahb.invsee.common.listener;
 
-import at.noahb.common.InvseePlugin;
+import at.noahb.invsee.InvseePlugin;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.event.EventBus;
 import net.luckperms.api.event.node.NodeRemoveEvent;

@@ -1,6 +1,6 @@
-package at.noahb.common.listener;
+package at.noahb.invsee.common.listener;
 
-import at.noahb.common.InvseePlugin;
+import at.noahb.invsee.InvseePlugin;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

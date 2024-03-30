@@ -1,7 +1,7 @@
-package at.noahb.invsee.session;
+package at.noahb.invsee.invsee.session;
 
-import at.noahb.common.InvseePlugin;
-import at.noahb.common.session.Session;
+import at.noahb.invsee.InvseePlugin;
+import at.noahb.invsee.common.session.Session;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;

@@ -1,8 +1,8 @@
-package at.noahb.endersee.session.manager;
+package at.noahb.invsee.endersee.session.manager;
 
-import at.noahb.common.InvseePlugin;
-import at.noahb.common.session.manager.SessionManager;
-import at.noahb.endersee.session.EnderseeSession;
+import at.noahb.invsee.InvseePlugin;
+import at.noahb.invsee.common.session.manager.SessionManager;
+import at.noahb.invsee.endersee.session.EnderseeSession;
 import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;

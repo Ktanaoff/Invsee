@@ -1,4 +1,4 @@
-package at.noahb.common.session;
+package at.noahb.invsee.common.session;
 
 import java.util.Set;
 import java.util.UUID;

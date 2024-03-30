@@ -1,6 +1,6 @@
-package at.noahb.invsee.command;
+package at.noahb.invsee.invsee.command;
 
-import at.noahb.common.InvseePlugin;
+import at.noahb.invsee.InvseePlugin;
 import net.kyori.adventure.text.Component;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
