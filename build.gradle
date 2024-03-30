@@ -50,16 +50,5 @@ processResources {
     }
 }
 
-tasks {
-    runServer {
-        minecraftVersion("1.20.4")
-        runPaper {
-            folia {
-                registerTask()
-                downloadPlugins {
-                    url("https://download.luckperms.net/1534/bukkit/loader/LuckPerms-Bukkit-5.4.121.jar")
-                }
-            }
-        }
-    }
-}
+runPaper.folia.registerTask()
+tasks.runServer.minecraftVersion("1.20.4")
