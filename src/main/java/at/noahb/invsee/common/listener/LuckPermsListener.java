@@ -8,6 +8,8 @@ import net.luckperms.api.model.user.User;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 
+import java.util.Objects;
+
 public class LuckPermsListener {
 
     private final InvseePlugin instance;
@@ -21,15 +23,18 @@ public class LuckPermsListener {
     }
 
     private void removeNode(NodeRemoveEvent nodeRemoveEvent) {
-        if ("invsee.invsee.command".equals(nodeRemoveEvent.getNode().getKey())) {
-            if (nodeRemoveEvent.isUser()) {
-                OfflinePlayer offlinePlayer = instance.getServer().getOfflinePlayer(((User) nodeRemoveEvent.getTarget()).getUniqueId());
+        if (!nodeRemoveEvent.isUser()) {
+            return;
+        }
+        OfflinePlayer offlinePlayer = instance.getServer().getOfflinePlayer(((User) nodeRemoveEvent.getTarget()).getUniqueId());
+        if (!(offlinePlayer instanceof Player player)) {
+            return;
+        }
 
-                if (offlinePlayer instanceof Player player) {
-                    instance.getInvseeSessionManager().removeSubscriberFromSession(player);
-                }
-
-            }
+        if (Objects.equals(instance.getInvseeCommand().getPermission(), nodeRemoveEvent.getNode().getKey())) {
+            instance.getInvseeSessionManager().removeSubscriberFromSession(player);
+        } else if (Objects.equals(instance.getEnderseeCommand().getPermission(), nodeRemoveEvent.getNode().getKey())) {
+            instance.getEnderseeSessionManager().removeSubscriberFromSession(player);
         }
     }
 }

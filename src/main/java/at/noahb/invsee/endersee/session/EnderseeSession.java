@@ -61,7 +61,7 @@ public class EnderseeSession implements Session {
                 executorService.submit(this::updatePlayerInventory);
             }
             Inventory enderChest = player.getEnderChest();
-            for (int i = 0; i <= enderChest.getSize(); i++) {
+            for (int i = 0; i < enderChest.getSize(); i++) {
                 enderChest.setItem(i, this.enderchest.getItem(i));
             }
 
