@@ -1,11 +1,2 @@
-pluginManagement {
-    repositories {
-        mavenCentral()
-        maven {
-            name = "jpenilla"
-            url = "https://repo.jpenilla.xyz/snapshots"
-        }
-    }
-}
 
 rootProject.name = 'Invsee'

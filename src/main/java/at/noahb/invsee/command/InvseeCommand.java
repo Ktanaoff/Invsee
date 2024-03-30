@@ -22,7 +22,7 @@ public class InvseeCommand extends Command {
                 new ArrayList<>()
         );
         this.instance = instance;
-        setPermission("invsee.command");
+        setPermission("invsee.invsee.command");
     }
 
     @Override
@@ -37,20 +37,20 @@ public class InvseeCommand extends Command {
             return true;
         }
 
-        OfflinePlayer other = instance.getServer().getPlayer(args[0]);
-
-        if (other == null) {
-            other = instance.getServer().getOfflinePlayer(args[0]);
+        if (!player.hasPermission("invsee.invsee.command")) {
+            sender.sendMessage("You don't have permissions to use that command");
         }
 
-        if (!other.isOnline()) {
-            // Offline player logic
+        OfflinePlayer other = instance.getServer().getOfflinePlayer(args[0]);
 
+        if (other instanceof Player) {
+            instance.getSessionManager().addSubscriberToSession(other, player.getUniqueId());
             return true;
         }
 
-        instance.getSessionManager().addSubscriberToSession(other, player.getUniqueId());
+        //todo OfflinePlayer logic
 
         return true;
     }
+
 }

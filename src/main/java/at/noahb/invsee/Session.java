@@ -1,14 +1,18 @@
 package at.noahb.invsee;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Instrument;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.locks.ReentrantLock;
 
 
 public class Session {
@@ -18,6 +22,8 @@ public class Session {
     private final Set<UUID> subscribers;
 
     private final Inventory inventory;
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final ReentrantLock lock = new ReentrantLock();
 
     public Session(OfflinePlayer player) {
         this.uuid = player.getUniqueId();
@@ -30,23 +36,7 @@ public class Session {
             this.inventory = Invsee.getInstance().getServer().createInventory(null, 45);
         }
 
-        initInventory();
-    }
-
-    private void initInventory() {
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-        if (offlinePlayer instanceof Player player) {
-            ItemStack[] playerInv = player.getInventory().getContents();
-            System.out.println(Arrays.toString(playerInv));
-            for (int i = 0; i < playerInv.length; i++) {
-                inventory.setItem(i, playerInv[i]);
-            }
-            ItemStack[] armorContents = player.getInventory().getArmorContents();
-
-            for (int i = 0; i < armorContents.length; i++) {
-                inventory.setItem(36+i, armorContents[i]);
-            }
-        }
+        updateSpectatorInventory();
     }
 
     public Session(OfflinePlayer player, UUID subscriber) {
@@ -75,7 +65,55 @@ public class Session {
         if (other == null) return;
 
         subscribers.add(subscriber);
-        player.openInventory(inventory);
+        player.getScheduler().run(Invsee.getInstance(), scheduledTask -> player.openInventory(inventory), null);
+    }
+
+    public void removeSubscriber(UUID subscriber) {
+        subscribers.remove(subscriber);
+    }
+
+    public void updateSpectatorInventory() {
+        if (!lock.tryLock()) {
+            System.out.println("no lock spec");
+            executorService.submit(this::updateSpectatorInventory);
+            return;
+        }
+        System.out.println("lock spec");
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+        if (offlinePlayer instanceof Player player) {
+            ItemStack[] playerInv = player.getInventory().getContents();
+            for (int i = 0; i < playerInv.length; i++) {
+                inventory.setItem(i, playerInv[i]);
+            }
+            ItemStack[] armorContents = player.getInventory().getArmorContents();
+
+            for (int i = 0; i < armorContents.length; i++) {
+                inventory.setItem(36+i, armorContents[i]);
+            }
+        }
+        lock.unlock();
+    }
+
+    public boolean hasSubscriber(UUID uuid) {
+        return subscribers.contains(uuid);
+    }
+
+    public void updatePlayerInventory() {
+        OfflinePlayer offlinePlayer = Invsee.getInstance().getServer().getOfflinePlayer(uuid);
+
+        if (offlinePlayer instanceof Player player) {
+            PlayerInventory playerInventory = player.getInventory();
+            if (!lock.tryLock()) {
+                System.out.println("No lock updatePlayerInv");
+                executorService.submit(this::updatePlayerInventory);
+            }
+            System.out.println("lock player");
+            for (int i = 0; i <= 40; i++) {
+                playerInventory.setItem(i, inventory.getItem(i));
+            }
+
+            lock.unlock();
+        }
     }
 
     @Override
@@ -89,9 +127,5 @@ public class Session {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
-    }
-
-    public void removeSubscriber(UUID subscriber) {
-        subscribers.remove(subscriber);
     }
 }
