@@ -24,19 +24,16 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
         if (event.getAction() == InventoryAction.NOTHING) {
             return;
         }
-        System.out.println("InvClick");
         handle(event.getWhoClicked());
     }
 
     @EventHandler
     public void onPickupItem(EntityPickupItemEvent event) {
-        System.out.println("pickup");
         handle(event.getEntity());
     }
 
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
-        System.out.println("drag");
         handle(event.getWhoClicked());
     }
 

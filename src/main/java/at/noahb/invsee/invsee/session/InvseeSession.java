@@ -64,6 +64,7 @@ public class InvseeSession implements Session {
     public void addSubscriber(UUID subscriber) {
         if (subscriber == null) return;
         if (subscribers.contains(subscriber)) return;
+
         Player player = InvseePlugin.getInstance().getServer().getPlayer(subscriber);
         if (player == null) return;
 
@@ -80,11 +81,9 @@ public class InvseeSession implements Session {
 
     public void updateSpectatorInventory() {
         if (!lock.tryLock()) {
-            System.out.println("no lock spec");
             executorService.submit(this::updateSpectatorInventory);
             return;
         }
-        System.out.println("lock spec");
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
         if (offlinePlayer instanceof Player player) {
             ItemStack[] playerInv = player.getInventory().getContents();
@@ -109,12 +108,10 @@ public class InvseeSession implements Session {
 
         if (offlinePlayer instanceof Player player) {
             if (!lock.tryLock()) {
-                System.out.println("No lock updatePlayerInv");
                 executorService.submit(this::updatePlayerInventory);
             }
             PlayerInventory playerInventory = player.getInventory();
 
-            System.out.println("lock player");
             for (int i = 0; i <= 40; i++) {
                 playerInventory.setItem(i, this.inventory.getItem(i));
             }

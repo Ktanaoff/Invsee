@@ -47,12 +47,12 @@ public abstract class SessionManager {
     }
 
     public void updateContent(Player player) {
+
         Optional<? extends Session> optionalSession = sessions.stream()
                 .filter(session -> session.getUuid().equals(player.getUniqueId()))
                 .findFirst();
 
         if (optionalSession.isPresent()) {
-            System.out.println("w");
             optionalSession.get().updateSpectatorInventory();
             return;
         }
@@ -60,7 +60,6 @@ public abstract class SessionManager {
         optionalSession = sessions.stream()
                 .filter(session -> session.hasSubscriber(player.getUniqueId()))
                 .findFirst();
-        System.out.println("a");
 
         optionalSession.ifPresent(Session::updatePlayerInventory);
     }

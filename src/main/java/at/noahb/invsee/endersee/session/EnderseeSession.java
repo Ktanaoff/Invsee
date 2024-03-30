@@ -58,12 +58,10 @@ public class EnderseeSession implements Session {
 
         if (offlinePlayer instanceof Player player) {
             if (!lock.tryLock()) {
-                System.out.println("No lock updatePlayerInv");
                 executorService.submit(this::updatePlayerInventory);
             }
             Inventory enderChest = player.getEnderChest();
-            System.out.println("lock player");
-            for (int i = 0; i <= 40; i++) {
+            for (int i = 0; i <= enderChest.getSize(); i++) {
                 enderChest.setItem(i, this.enderchest.getItem(i));
             }
 
@@ -74,11 +72,9 @@ public class EnderseeSession implements Session {
     @Override
     public void updateSpectatorInventory() {
         if (!lock.tryLock()) {
-            System.out.println("no lock spec");
             executorService.submit(this::updateSpectatorInventory);
             return;
         }
-        System.out.println("lock spec");
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
         if (offlinePlayer instanceof Player player) {
             ItemStack[] playerInv = player.getEnderChest().getContents();
@@ -101,12 +97,11 @@ public class EnderseeSession implements Session {
 
         subscribers.add(subscriber);
         player.getScheduler().run(InvseePlugin.getInstance(), scheduledTask -> player.openInventory(enderchest), null);
-        System.out.println(subscribers);
     }
 
     @Override
     public Set<UUID> getSubscribers() {
-        return null;
+        return subscribers;
     }
 
     @Override
@@ -116,6 +111,6 @@ public class EnderseeSession implements Session {
 
     @Override
     public boolean hasSubscriber(UUID subscriber) {
-        return subscribers.contains(uuid);
+        return subscribers.contains(subscriber);
     }
 }
