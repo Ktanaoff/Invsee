@@ -1,15 +1,16 @@
 package at.noahb.invsee;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Instrument;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
@@ -88,7 +89,7 @@ public class Session {
             ItemStack[] armorContents = player.getInventory().getArmorContents();
 
             for (int i = 0; i < armorContents.length; i++) {
-                inventory.setItem(36+i, armorContents[i]);
+                inventory.setItem(36 + i, armorContents[i]);
             }
         }
         lock.unlock();

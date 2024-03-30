@@ -5,14 +5,8 @@ import at.noahb.invsee.listener.InventoryListener;
 import at.noahb.invsee.listener.LuckPermsListener;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
 
 public final class Invsee extends JavaPlugin {
 

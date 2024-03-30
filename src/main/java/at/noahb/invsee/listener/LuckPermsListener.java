@@ -7,7 +7,6 @@ import net.luckperms.api.event.node.NodeRemoveEvent;
 import net.luckperms.api.model.user.User;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 
 public class LuckPermsListener {
 
@@ -22,15 +21,15 @@ public class LuckPermsListener {
     }
 
     private void removeNode(NodeRemoveEvent nodeRemoveEvent) {
-       if ("invsee.invsee.command".equals(nodeRemoveEvent.getNode().getKey())) {
-           if (nodeRemoveEvent.isUser()) {
-               OfflinePlayer offlinePlayer = instance.getServer().getOfflinePlayer(((User) nodeRemoveEvent.getTarget()).getUniqueId());
+        if ("invsee.invsee.command".equals(nodeRemoveEvent.getNode().getKey())) {
+            if (nodeRemoveEvent.isUser()) {
+                OfflinePlayer offlinePlayer = instance.getServer().getOfflinePlayer(((User) nodeRemoveEvent.getTarget()).getUniqueId());
 
-               if (offlinePlayer instanceof Player player) {
-                   instance.getSessionManager().removeSubscriberFromSession(player);
-               }
+                if (offlinePlayer instanceof Player player) {
+                    instance.getSessionManager().removeSubscriberFromSession(player);
+                }
 
-           }
-       }
+            }
+        }
     }
 }
