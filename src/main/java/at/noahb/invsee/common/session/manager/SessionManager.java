@@ -62,6 +62,7 @@ public abstract class SessionManager {
                 .findFirst();
 
         optionalSession.ifPresent(Session::updatePlayerInventory);
+
     }
 
     protected void addSession(Session session) {

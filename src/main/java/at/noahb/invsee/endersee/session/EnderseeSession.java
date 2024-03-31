@@ -54,35 +54,28 @@ public class EnderseeSession implements Session {
 
     @Override
     public void updatePlayerInventory() {
-        OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(uuid);
-
-        if (offlinePlayer instanceof Player player) {
-            if (!lock.tryLock()) {
-                executorService.submit(this::updatePlayerInventory);
+        update(() -> {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            if (offlinePlayer instanceof Player player) {
+                Inventory enderChest = player.getEnderChest();
+                for (int i = 0; i < enderChest.getSize(); i++) {
+                    enderChest.setItem(i, this.enderchest.getItem(i));
+                }
             }
-            Inventory enderChest = player.getEnderChest();
-            for (int i = 0; i < enderChest.getSize(); i++) {
-                enderChest.setItem(i, this.enderchest.getItem(i));
-            }
-
-            lock.unlock();
-        }
+        });
     }
 
     @Override
     public void updateSpectatorInventory() {
-        if (!lock.tryLock()) {
-            executorService.submit(this::updateSpectatorInventory);
-            return;
-        }
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-        if (offlinePlayer instanceof Player player) {
-            ItemStack[] playerInv = player.getEnderChest().getContents();
-            for (int i = 0; i < playerInv.length; i++) {
-                enderchest.setItem(i, playerInv[i]);
+        update(() -> {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            if (offlinePlayer instanceof Player player) {
+                ItemStack[] playerInv = player.getEnderChest().getContents();
+                for (int i = 0; i < playerInv.length; i++) {
+                    enderchest.setItem(i, playerInv[i]);
+                }
             }
-        }
-        lock.unlock();
+        });
     }
 
     @Override
@@ -112,5 +105,21 @@ public class EnderseeSession implements Session {
     @Override
     public boolean hasSubscriber(UUID subscriber) {
         return subscribers.contains(subscriber);
+    }
+
+    @Override
+    public ReentrantLock getLock() {
+        return lock;
+    }
+
+    public void update(Runnable runnable) {
+        while (!lock.tryLock()) {
+
+        }
+        try {
+            runnable.run();
+        } finally {
+            if (lock.isHeldByCurrentThread()) lock.unlock();
+        }
     }
 }

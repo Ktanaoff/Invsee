@@ -23,9 +23,7 @@ import static net.kyori.adventure.text.Component.text;
 public class InvseeSession implements Session {
 
     private final UUID uuid;
-
     private final Set<UUID> subscribers;
-
     private final Inventory inventory;
     private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final ReentrantLock lock = new ReentrantLock();
@@ -80,23 +78,21 @@ public class InvseeSession implements Session {
     }
 
     public void updateSpectatorInventory() {
-        if (!lock.tryLock()) {
-            executorService.submit(this::updateSpectatorInventory);
-            return;
-        }
-        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-        if (offlinePlayer instanceof Player player) {
-            ItemStack[] playerInv = player.getInventory().getContents();
-            for (int i = 0; i < playerInv.length; i++) {
-                inventory.setItem(i, playerInv[i]);
-            }
-            ItemStack[] armorContents = player.getInventory().getArmorContents();
+        update(() -> {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
 
-            for (int i = 0; i < armorContents.length; i++) {
-                inventory.setItem(36 + i, armorContents[i]);
+            if (offlinePlayer instanceof Player player) {
+                ItemStack[] playerInv = player.getInventory().getContents();
+                for (int i = 0; i < playerInv.length; i++) {
+                    inventory.setItem(i, playerInv[i]);
+                }
+                ItemStack[] armorContents = player.getInventory().getArmorContents();
+
+                for (int i = 0; i < armorContents.length; i++) {
+                    inventory.setItem(36 + i, armorContents[i]);
+                }
             }
-        }
-        lock.unlock();
+        });
     }
 
     public boolean hasSubscriber(UUID uuid) {
@@ -104,20 +100,16 @@ public class InvseeSession implements Session {
     }
 
     public void updatePlayerInventory() {
-        OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(uuid);
+        update(() -> {
+            OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(uuid);
+            if (offlinePlayer instanceof Player player) {
+                PlayerInventory playerInventory = player.getInventory();
 
-        if (offlinePlayer instanceof Player player) {
-            if (!lock.tryLock()) {
-                executorService.submit(this::updatePlayerInventory);
+                for (int i = 0; i <= 40; i++) {
+                    playerInventory.setItem(i, this.inventory.getItem(i));
+                }
             }
-            PlayerInventory playerInventory = player.getInventory();
-
-            for (int i = 0; i <= 40; i++) {
-                playerInventory.setItem(i, this.inventory.getItem(i));
-            }
-
-            lock.unlock();
-        }
+        });
     }
 
     @Override
@@ -131,5 +123,10 @@ public class InvseeSession implements Session {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
+    }
+
+    @Override
+    public ReentrantLock getLock() {
+        return lock;
     }
 }

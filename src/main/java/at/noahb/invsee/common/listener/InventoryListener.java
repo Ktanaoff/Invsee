@@ -21,9 +21,10 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getAction() == InventoryAction.NOTHING) {
+        if (InventoryAction.NOTHING.equals(event.getAction())) {
             return;
         }
+
         handle(event.getWhoClicked());
     }
 
@@ -38,9 +39,12 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
     }
 
     private void handle(LivingEntity entity) {
-        if (entity instanceof Player player) {
-            player.getScheduler().run(instance, scheduledTask -> instance.getInvseeSessionManager().updateContent(player), null);
-            player.getScheduler().run(instance, scheduledTask -> instance.getEnderseeSessionManager().updateContent(player), null);
+        if (!(entity instanceof Player player)) {
+            return;
         }
+
+        instance.getInvseeSessionManager().updateContent(player);
+        instance.getEnderseeSessionManager().updateContent(player);
     }
+
 }
