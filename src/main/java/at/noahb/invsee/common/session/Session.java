@@ -25,6 +25,20 @@ public interface Session {
 
     void updateSpectatorInventory();
 
+    Inventory getInventory();
+
+    Set<UUID> getSubscribers();
+
+    void removeSubscriber(UUID subscriber);
+
+    boolean hasSubscriber(UUID subscriber);
+
+    ReentrantLock getLock();
+
+    void cache(Player player);
+
+    Player getCachedPlayer();
+
     default void addSubscriber(UUID subscriber) {
         if (subscriber == null) return;
         if (hasSubscriber(subscriber)) return;
@@ -38,29 +52,34 @@ public interface Session {
         player.getScheduler().run(InvseePlugin.getInstance(), scheduledTask -> player.openInventory(getInventory()), null);
     }
 
-    Inventory getInventory();
-
-    Set<UUID> getSubscribers();
-
-    void removeSubscriber(UUID subscriber);
-
-    boolean hasSubscriber(UUID subscriber);
-
-    ReentrantLock getLock();
+    default void save() {
+        Player cachedPlayer = getCachedPlayer();
+        if (cachedPlayer != null) {
+            cachedPlayer.saveData();
+        }
+    }
 
     default void update(Runnable runnable) {
-        System.out.println("update");
-
         try {
-            if (getLock().tryLock()) {
-                runnable.run();
+            getLock().lock();
+            runnable.run();
+            if (isOffline()) {
+                save();
             }
         } finally {
             if (getLock().isHeldByCurrentThread()) getLock().unlock();
         }
     }
 
+    default boolean isOffline() {
+        return !InvseePlugin.getInstance().getServer().getOfflinePlayer(getUuid()).isOnline();
+    }
+
     default Optional<Player> getPlayerOffline(OfflinePlayer player) {
+        Player cached = getCachedPlayer();
+        if (cached != null) {
+            return Optional.of(cached);
+        }
         System.out.println("offline");
         GameProfile profile = new GameProfile(player.getUniqueId(),
                 player.getName() != null ? player.getName() : player.getUniqueId().toString());
@@ -75,6 +94,7 @@ public interface Session {
 
         Player target = serverPlayer.getBukkitEntity();
         target.loadData();
+        cache(target);
         return Optional.of(target);
     }
 }

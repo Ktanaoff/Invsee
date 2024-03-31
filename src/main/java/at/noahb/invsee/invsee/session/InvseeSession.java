@@ -2,6 +2,8 @@ package at.noahb.invsee.invsee.session;
 
 import at.noahb.invsee.InvseePlugin;
 import at.noahb.invsee.common.session.Session;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -9,8 +11,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static net.kyori.adventure.text.Component.text;
@@ -21,8 +22,10 @@ public class InvseeSession implements Session {
     private final UUID uuid;
     private final Set<UUID> subscribers;
     private final Inventory inventory;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
     private final ReentrantLock lock = new ReentrantLock();
+    private final Cache<UUID, Player> playerCache = CacheBuilder.newBuilder()
+            .expireAfterAccess(10, TimeUnit.SECONDS)
+            .build();
 
     public InvseeSession(OfflinePlayer offlinePlayer) {
         this.uuid = offlinePlayer.getUniqueId();
@@ -111,6 +114,16 @@ public class InvseeSession implements Session {
     @Override
     public ReentrantLock getLock() {
         return lock;
+    }
+
+    @Override
+    public void cache(Player player) {
+        playerCache.put(this.uuid, player);
+    }
+
+    @Override
+    public Player getCachedPlayer() {
+        return playerCache.getIfPresent(this.uuid);
     }
 
     @Override

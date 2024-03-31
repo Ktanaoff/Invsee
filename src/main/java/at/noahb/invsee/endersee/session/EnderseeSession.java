@@ -2,6 +2,8 @@ package at.noahb.invsee.endersee.session;
 
 import at.noahb.invsee.InvseePlugin;
 import at.noahb.invsee.common.session.Session;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
@@ -9,12 +11,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static net.kyori.adventure.text.Component.text;
@@ -26,7 +24,9 @@ public class EnderseeSession implements Session {
     private final Set<UUID> subscribers;
 
     private final Inventory enderchest;
-    private final ExecutorService executorService = Executors.newCachedThreadPool();
+    private final Cache<UUID, Player> playerCache = CacheBuilder.newBuilder()
+            .expireAfterAccess(10, TimeUnit.SECONDS)
+            .build();
     private final ReentrantLock lock = new ReentrantLock();
 
     public EnderseeSession(OfflinePlayer offlinePlayer) {
@@ -61,7 +61,8 @@ public class EnderseeSession implements Session {
             if (enderChest == null) {
                 return;
             }
-            for (int i = 0; i < enderChest.getSize(); i++) {
+
+            for (int i = 0; i < InventoryType.ENDER_CHEST.getDefaultSize(); i++) {
                 enderChest.setItem(i, this.enderchest.getItem(i));
             }
         });
@@ -82,7 +83,7 @@ public class EnderseeSession implements Session {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             Inventory enderChest = getEnderChest(offlinePlayer);
 
-            for (int i = 0; i < enderChest.getSize(); i++) {
+            for (int i = 0; i < InventoryType.ENDER_CHEST.getDefaultSize(); i++) {
                 enderchest.setItem(i, enderChest.getItem(i));
             }
         });
@@ -111,5 +112,28 @@ public class EnderseeSession implements Session {
     @Override
     public ReentrantLock getLock() {
         return lock;
+    }
+
+    @Override
+    public void cache(Player player) {
+        playerCache.put(this.uuid, player);
+    }
+
+    @Override
+    public Player getCachedPlayer() {
+        return playerCache.getIfPresent(this.uuid);
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (object == null || getClass() != object.getClass()) return false;
+        EnderseeSession that = (EnderseeSession) object;
+        return Objects.equals(uuid, that.uuid);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uuid);
     }
 }

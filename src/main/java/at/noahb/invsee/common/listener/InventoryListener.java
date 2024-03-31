@@ -42,9 +42,7 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
         if (!(entity instanceof Player player)) {
             return;
         }
-
-        instance.getInvseeSessionManager().updateContent(player);
-        instance.getEnderseeSessionManager().updateContent(player);
+        player.getScheduler().run(instance, scheduledTask -> instance.getInvseeSessionManager().updateContent(player), null);
+        player.getScheduler().run(instance, scheduledTask -> instance.getEnderseeSessionManager().updateContent(player), null);
     }
-
 }
