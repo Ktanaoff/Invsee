@@ -47,7 +47,6 @@ public abstract class SessionManager {
     }
 
     public void updateContent(Player player) {
-
         Optional<? extends Session> optionalSession = sessions.stream()
                 .filter(session -> session.getUuid().equals(player.getUniqueId()))
                 .findFirst();
@@ -62,7 +61,6 @@ public abstract class SessionManager {
                 .findFirst();
 
         optionalSession.ifPresent(Session::updatePlayerInventory);
-
     }
 
     protected void addSession(Session session) {

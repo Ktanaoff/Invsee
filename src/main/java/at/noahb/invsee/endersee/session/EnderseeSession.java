@@ -79,22 +79,13 @@ public class EnderseeSession implements Session {
     }
 
     @Override
-    public void addSubscriber(UUID subscriber) {
-        if (subscriber == null) return;
-        if (subscribers.contains(subscriber)) return;
-        Player player = InvseePlugin.getInstance().getServer().getPlayer(subscriber);
-        if (player == null) return;
-
-        Player other = InvseePlugin.getInstance().getServer().getPlayer(uuid);
-        if (other == null) return;
-
-        subscribers.add(subscriber);
-        player.getScheduler().run(InvseePlugin.getInstance(), scheduledTask -> player.openInventory(enderchest), null);
+    public Set<UUID> getSubscribers() {
+        return subscribers;
     }
 
     @Override
-    public Set<UUID> getSubscribers() {
-        return subscribers;
+    public Inventory getInventory() {
+        return enderchest;
     }
 
     @Override
@@ -110,16 +101,5 @@ public class EnderseeSession implements Session {
     @Override
     public ReentrantLock getLock() {
         return lock;
-    }
-
-    public void update(Runnable runnable) {
-        while (!lock.tryLock()) {
-
-        }
-        try {
-            runnable.run();
-        } finally {
-            if (lock.isHeldByCurrentThread()) lock.unlock();
-        }
     }
 }

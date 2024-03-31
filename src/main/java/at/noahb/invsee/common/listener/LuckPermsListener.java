@@ -18,7 +18,6 @@ public class LuckPermsListener {
         this.instance = instance;
 
         EventBus eventBus = luckPerms.getEventBus();
-
         eventBus.subscribe(this.instance, NodeRemoveEvent.class, this::removeNode);
     }
 

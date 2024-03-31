@@ -47,36 +47,27 @@ public class InvseeSession implements Session {
         addSubscriber(subscriber);
     }
 
+    @Override
     public UUID getUuid() {
         return uuid;
     }
 
+    @Override
     public Set<UUID> getSubscribers() {
         return subscribers;
     }
 
+    @Override
     public Inventory getInventory() {
         return inventory;
     }
 
-    public void addSubscriber(UUID subscriber) {
-        if (subscriber == null) return;
-        if (subscribers.contains(subscriber)) return;
-
-        Player player = InvseePlugin.getInstance().getServer().getPlayer(subscriber);
-        if (player == null) return;
-
-        Player other = InvseePlugin.getInstance().getServer().getPlayer(uuid);
-        if (other == null) return;
-
-        subscribers.add(subscriber);
-        player.getScheduler().run(InvseePlugin.getInstance(), scheduledTask -> player.openInventory(inventory), null);
-    }
-
+    @Override
     public void removeSubscriber(UUID subscriber) {
         subscribers.remove(subscriber);
     }
 
+    @Override
     public void updateSpectatorInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
@@ -95,10 +86,12 @@ public class InvseeSession implements Session {
         });
     }
 
+    @Override
     public boolean hasSubscriber(UUID uuid) {
         return subscribers.contains(uuid);
     }
 
+    @Override
     public void updatePlayerInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(uuid);
@@ -110,6 +103,11 @@ public class InvseeSession implements Session {
                 }
             }
         });
+    }
+
+    @Override
+    public ReentrantLock getLock() {
+        return lock;
     }
 
     @Override
@@ -125,8 +123,4 @@ public class InvseeSession implements Session {
         return Objects.hash(uuid);
     }
 
-    @Override
-    public ReentrantLock getLock() {
-        return lock;
-    }
 }
