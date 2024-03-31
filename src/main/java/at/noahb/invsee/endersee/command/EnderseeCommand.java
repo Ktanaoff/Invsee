@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class EnderseeCommand extends Command {
 
@@ -22,6 +23,7 @@ public class EnderseeCommand extends Command {
                 new ArrayList<>()
         );
         this.instance = instance;
+        setAliases(List.of("esee", "es", "ecsee"));
         setPermission("invsee.invsee.command");
     }
 
@@ -43,13 +45,7 @@ public class EnderseeCommand extends Command {
         }
 
         OfflinePlayer other = instance.getServer().getOfflinePlayer(args[0]);
-
-        if (other instanceof Player) {
-            instance.getEnderseeSessionManager().addSubscriberToSession(other, player.getUniqueId());
-            return true;
-        }
-
-        //todo OfflinePlayer logic
+        instance.getEnderseeSessionManager().addSubscriberToSession(other, player.getUniqueId());
 
         return true;
     }

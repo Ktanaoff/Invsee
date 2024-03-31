@@ -6,13 +6,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.locks.ReentrantLock;
@@ -62,6 +58,16 @@ public class InvseeSession implements Session {
         return inventory;
     }
 
+    private PlayerInventory getPlayerInventory(OfflinePlayer offlinePlayer) {
+        if (offlinePlayer instanceof Player player) {
+            return player.getInventory();
+        }
+
+        Optional<Player> player = getPlayerOffline(offlinePlayer);
+
+        return player.map(Player::getInventory).orElse(null);
+    }
+
     @Override
     public void removeSubscriber(UUID subscriber) {
         subscribers.remove(subscriber);
@@ -71,17 +77,13 @@ public class InvseeSession implements Session {
     public void updateSpectatorInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-
-            if (offlinePlayer instanceof Player player) {
-                ItemStack[] playerInv = player.getInventory().getContents();
-                for (int i = 0; i < playerInv.length; i++) {
-                    inventory.setItem(i, playerInv[i]);
-                }
-                ItemStack[] armorContents = player.getInventory().getArmorContents();
-
-                for (int i = 0; i < armorContents.length; i++) {
-                    inventory.setItem(36 + i, armorContents[i]);
-                }
+            PlayerInventory playerInv = getPlayerInventory(offlinePlayer);
+            if (playerInv == null) {
+                return;
+            }
+            System.out.println(playerInv.getSize());
+            for (int i = 0; i < 41; i++) {
+                inventory.setItem(i, playerInv.getItem(i));
             }
         });
     }
@@ -95,12 +97,13 @@ public class InvseeSession implements Session {
     public void updatePlayerInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(uuid);
-            if (offlinePlayer instanceof Player player) {
-                PlayerInventory playerInventory = player.getInventory();
-
-                for (int i = 0; i <= 40; i++) {
-                    playerInventory.setItem(i, this.inventory.getItem(i));
-                }
+            PlayerInventory playerInventory = getPlayerInventory(offlinePlayer);
+            if (playerInventory == null) {
+                return;
+            }
+            System.out.println(playerInventory.getSize());
+            for (int i = 0; i <= playerInventory.getSize(); i++) {
+                playerInventory.setItem(i, this.inventory.getItem(i));
             }
         });
     }

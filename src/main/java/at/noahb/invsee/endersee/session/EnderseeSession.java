@@ -4,12 +4,13 @@ import at.noahb.invsee.InvseePlugin;
 import at.noahb.invsee.common.session.Session;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
@@ -56,24 +57,33 @@ public class EnderseeSession implements Session {
     public void updatePlayerInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            if (offlinePlayer instanceof Player player) {
-                Inventory enderChest = player.getEnderChest();
-                for (int i = 0; i < enderChest.getSize(); i++) {
-                    enderChest.setItem(i, this.enderchest.getItem(i));
-                }
+            Inventory enderChest = getEnderChest(offlinePlayer);
+            if (enderChest == null) {
+                return;
+            }
+            for (int i = 0; i < enderChest.getSize(); i++) {
+                enderChest.setItem(i, this.enderchest.getItem(i));
             }
         });
+    }
+
+    private Inventory getEnderChest(OfflinePlayer offline) {
+        if (offline instanceof Player player) {
+            return player.getEnderChest();
+        }
+
+        Optional<Player> player = getPlayerOffline(offline);
+        return player.<Inventory>map(HumanEntity::getInventory).orElse(null);
     }
 
     @Override
     public void updateSpectatorInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            if (offlinePlayer instanceof Player player) {
-                ItemStack[] playerInv = player.getEnderChest().getContents();
-                for (int i = 0; i < playerInv.length; i++) {
-                    enderchest.setItem(i, playerInv[i]);
-                }
+            Inventory enderChest = getEnderChest(offlinePlayer);
+
+            for (int i = 0; i < enderChest.getSize(); i++) {
+                enderchest.setItem(i, enderChest.getItem(i));
             }
         });
     }

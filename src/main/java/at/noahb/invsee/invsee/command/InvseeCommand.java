@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class InvseeCommand extends Command {
 
@@ -22,6 +23,7 @@ public class InvseeCommand extends Command {
                 new ArrayList<>()
         );
         this.instance = instance;
+        setAliases(List.of("isee", "is", "inv"));
         setPermission("invsee.invsee.command");
     }
 

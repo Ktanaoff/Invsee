@@ -1,6 +1,7 @@
 plugins {
     id 'java'
     id 'xyz.jpenilla.run-paper' version '2.2.0'
+    id 'io.papermc.paperweight.userdev' version "1.5.12"
 }
 
 group = 'at.noahb'
@@ -21,6 +22,7 @@ repositories {
 dependencies {
     compileOnly "io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT"
     compileOnly "net.luckperms:api:5.4"
+    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
 }
 
 def targetJavaVersion = 17
@@ -41,6 +43,8 @@ tasks.withType(JavaCompile).configureEach {
     }
 }
 
+tasks.assemble.dependsOn(reobfJar)
+
 processResources {
     def props = [version: version]
     inputs.properties props
@@ -51,4 +55,9 @@ processResources {
 }
 
 runPaper.folia.registerTask()
-tasks.runServer.minecraftVersion("1.20.4")
+tasks {
+    runServer {
+        minecraftVersion("1.20.4")
+        dependsOn(reobfJar)
+    }
+}

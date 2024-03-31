@@ -1,7 +1,6 @@
-package at.noahb.invsee.common.session.manager;
+package at.noahb.invsee.common.session;
 
 import at.noahb.invsee.InvseePlugin;
-import at.noahb.invsee.common.session.Session;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
@@ -20,10 +19,6 @@ public abstract class SessionManager {
 
     public SessionManager(InvseePlugin instance) {
         this.instance = instance;
-    }
-
-    public Set<UUID> getSubscribers(OfflinePlayer player) {
-        return sessions.stream().filter(session -> player.getUniqueId().equals(session.getUuid())).findFirst().orElse(createSession(player)).getSubscribers();
     }
 
     public void addSubscriberToSession(OfflinePlayer player, UUID subscriber) {

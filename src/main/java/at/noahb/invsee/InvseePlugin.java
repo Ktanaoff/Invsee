@@ -12,8 +12,6 @@ import org.bukkit.command.Command;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.List;
-
 public final class InvseePlugin extends JavaPlugin {
 
     private static InvseePlugin instance;
@@ -29,7 +27,6 @@ public final class InvseePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
         instance = this;
         invseeSessionManager = new InvseeSessionManager(instance);
         enderseeSessionManager = new EnderseeSessionManager(instance);
@@ -47,10 +44,8 @@ public final class InvseePlugin extends JavaPlugin {
     private void registerCommands() {
         invseeCommand = new InvseeCommand(this);
         getServer().getCommandMap().register("invsee", invseeCommand);
-        invseeCommand.setAliases(List.of("isee", "is", "inv"));
         enderseeCommand = new EnderseeCommand(this);
         getServer().getCommandMap().register("endersee", enderseeCommand);
-        enderseeCommand.setAliases(List.of("esee", "es", "ecsee"));
     }
 
     public InvseeSessionManager getInvseeSessionManager() {

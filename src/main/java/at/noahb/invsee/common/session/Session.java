@@ -1,9 +1,19 @@
 package at.noahb.invsee.common.session;
 
 import at.noahb.invsee.InvseePlugin;
+import com.mojang.authlib.GameProfile;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ClientInformation;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
@@ -42,10 +52,29 @@ public interface Session {
         System.out.println("update");
 
         try {
-            getLock().lock();
-            runnable.run();
+            if (getLock().tryLock()) {
+                runnable.run();
+            }
         } finally {
             if (getLock().isHeldByCurrentThread()) getLock().unlock();
         }
+    }
+
+    default Optional<Player> getPlayerOffline(OfflinePlayer player) {
+        System.out.println("offline");
+        GameProfile profile = new GameProfile(player.getUniqueId(),
+                player.getName() != null ? player.getName() : player.getUniqueId().toString());
+        MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
+        ServerLevel level = server.getLevel(Level.OVERWORLD);
+
+        if (level == null) {
+            return Optional.empty();
+        }
+
+        ServerPlayer serverPlayer = new ServerPlayer(server, level, profile, ClientInformation.createDefault());
+
+        Player target = serverPlayer.getBukkitEntity();
+        target.loadData();
+        return Optional.of(target);
     }
 }
