@@ -13,6 +13,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -55,6 +56,7 @@ public interface Session {
     default void save() {
         Player cachedPlayer = getCachedPlayer();
         if (cachedPlayer != null) {
+            System.out.println(Arrays.toString(cachedPlayer.getEnderChest().getContents()));
             cachedPlayer.saveData();
         }
     }
@@ -80,7 +82,6 @@ public interface Session {
         if (cached != null) {
             return Optional.of(cached);
         }
-        System.out.println("offline");
         GameProfile profile = new GameProfile(player.getUniqueId(),
                 player.getName() != null ? player.getName() : player.getUniqueId().toString());
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();

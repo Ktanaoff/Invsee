@@ -61,7 +61,6 @@ public class EnderseeSession implements Session {
             if (enderChest == null) {
                 return;
             }
-
             for (int i = 0; i < InventoryType.ENDER_CHEST.getDefaultSize(); i++) {
                 enderChest.setItem(i, this.enderchest.getItem(i));
             }
@@ -74,7 +73,7 @@ public class EnderseeSession implements Session {
         }
 
         Optional<Player> player = getPlayerOffline(offline);
-        return player.<Inventory>map(HumanEntity::getInventory).orElse(null);
+        return player.map(HumanEntity::getEnderChest).orElse(null);
     }
 
     @Override
