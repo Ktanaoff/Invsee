@@ -62,6 +62,6 @@ public abstract class SessionManager {
         sessions.add(session);
     }
 
-    protected abstract Session createSession(OfflinePlayer offlinePlayer, UUID subscriber);
+    protected abstract void createSession(OfflinePlayer offlinePlayer, UUID subscriber);
 
 }
