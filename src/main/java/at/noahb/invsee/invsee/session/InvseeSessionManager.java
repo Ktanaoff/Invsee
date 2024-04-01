@@ -19,8 +19,4 @@ public class InvseeSessionManager extends SessionManager {
         return invseeSession;
     }
 
-    @Override
-    public InvseeSession createSession(OfflinePlayer offlinePlayer) {
-        return createSession(offlinePlayer, null);
-    }
 }

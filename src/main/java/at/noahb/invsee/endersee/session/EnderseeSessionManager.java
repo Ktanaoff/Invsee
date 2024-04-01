@@ -17,9 +17,4 @@ public class EnderseeSessionManager extends SessionManager {
         addSession(enderseeSession);
         return enderseeSession;
     }
-
-    @Override
-    protected EnderseeSession createSession(OfflinePlayer offlinePlayer) {
-        return createSession(offlinePlayer, null);
-    }
 }
