@@ -10,12 +10,13 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
+import java.util.Objects;
 
-public abstract class AbstractInvseeCommand extends Command {
+public abstract class AbstractPluginCommand extends Command {
 
-    private InvseePlugin instance;
+    private final InvseePlugin instance;
 
-    public AbstractInvseeCommand(InvseePlugin instance, String name, String description, String usage, String permission, List<String> aliases) {
+    public AbstractPluginCommand(InvseePlugin instance, String name, String description, String usage, String permission, List<String> aliases) {
         super(name, description, usage, aliases);
         this.instance = instance;
 
@@ -34,13 +35,13 @@ public abstract class AbstractInvseeCommand extends Command {
             return true;
         }
 
-        if (!player.hasPermission(getPermission())) {
+        if (!player.hasPermission(Objects.requireNonNull(getPermission(), this::getCommandPermission))) {
             sender.sendMessage("You don't have permissions to use that command");
             return true;
         }
 
         OfflinePlayer other = instance.getServer().getOfflinePlayer(args[0]);
-        instance.getInvseeSessionManager().addSubscriberToSession(other, player.getUniqueId());
+        getSessionManager().addSubscriberToSession(other, player.getUniqueId());
 
         return true;
     }
@@ -49,5 +50,6 @@ public abstract class AbstractInvseeCommand extends Command {
         return instance;
     }
 
+    protected abstract String getCommandPermission();
     protected abstract SessionManager getSessionManager();
 }
