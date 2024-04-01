@@ -21,25 +21,6 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 public interface Session {
-    UUID getUniqueIdOfObservedPlayer();
-
-    void updateObservedInventory();
-
-    void updateSubscriberInventory();
-
-    Inventory getInventory();
-
-    Set<UUID> getSubscribers();
-
-    void removeSubscriber(UUID subscriber);
-
-    boolean hasSubscriber(UUID subscriber);
-
-    ReentrantLock getLock();
-
-    void cache(Player player);
-
-    Player getCachedPlayer();
 
     default void addSubscriber(UUID subscriber) {
         if (subscriber == null) return;
@@ -101,4 +82,24 @@ public interface Session {
         cache(target);
         return Optional.of(target);
     }
+
+    UUID getUniqueIdOfObservedPlayer();
+
+    void updateObservedInventory();
+
+    void updateSubscriberInventory();
+
+    Inventory getInventory();
+
+    Set<UUID> getSubscribers();
+
+    void removeSubscriber(UUID subscriber);
+
+    boolean hasSubscriber(UUID subscriber);
+
+    ReentrantLock getLock();
+
+    void cache(Player player);
+
+    Player getCachedPlayer();
 }

@@ -51,5 +51,6 @@ public abstract class AbstractPluginCommand extends Command {
     }
 
     protected abstract String getCommandPermission();
+
     protected abstract SessionManager getSessionManager();
 }

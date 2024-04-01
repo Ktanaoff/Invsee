@@ -11,6 +11,7 @@ import java.util.List;
 public class EnderseeCommand extends AbstractPluginCommand {
 
     private static final String PERMISSION = "invsee.endersee.command";
+
     public EnderseeCommand(InvseePlugin instance) {
         super(
                 instance,
