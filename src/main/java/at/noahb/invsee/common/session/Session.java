@@ -2,6 +2,7 @@ package at.noahb.invsee.common.session;
 
 import at.noahb.invsee.InvseePlugin;
 import com.mojang.authlib.GameProfile;
+import net.kyori.adventure.text.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
@@ -13,7 +14,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -46,8 +47,11 @@ public interface Session {
         Player player = InvseePlugin.getInstance().getServer().getPlayer(subscriber);
         if (player == null) return;
 
-        Player other = InvseePlugin.getInstance().getServer().getPlayer(getUniqueIdOfObservedPlayer());
-        if (other == null) return;
+        OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(getUniqueIdOfObservedPlayer());
+        Optional<Player> other = getPlayerOffline(offlinePlayer);
+        if (other.isEmpty()) {
+            player.sendMessage(Component.text("Could not find player with name ").append(Component.text(Objects.requireNonNull(offlinePlayer.getName(), "<null>"))));
+        }
 
         getSubscribers().add(subscriber);
         player.getScheduler().run(InvseePlugin.getInstance(), scheduledTask -> player.openInventory(getInventory()), null);
@@ -56,7 +60,6 @@ public interface Session {
     default void save() {
         Player cachedPlayer = getCachedPlayer();
         if (cachedPlayer != null) {
-            System.out.println(Arrays.toString(cachedPlayer.getEnderChest().getContents()));
             cachedPlayer.saveData();
         }
     }
