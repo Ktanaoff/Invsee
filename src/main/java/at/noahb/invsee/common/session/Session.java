@@ -20,11 +20,11 @@ import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
 public interface Session {
-    UUID getUuid();
+    UUID getUniqueIdOfObservedPlayer();
 
-    void updatePlayerInventory();
+    void updateObservedInventory();
 
-    void updateSpectatorInventory();
+    void updateSubscriberInventory();
 
     Inventory getInventory();
 
@@ -46,7 +46,7 @@ public interface Session {
         Player player = InvseePlugin.getInstance().getServer().getPlayer(subscriber);
         if (player == null) return;
 
-        Player other = InvseePlugin.getInstance().getServer().getPlayer(getUuid());
+        Player other = InvseePlugin.getInstance().getServer().getPlayer(getUniqueIdOfObservedPlayer());
         if (other == null) return;
 
         getSubscribers().add(subscriber);
@@ -74,7 +74,7 @@ public interface Session {
     }
 
     default boolean isOffline() {
-        return !InvseePlugin.getInstance().getServer().getOfflinePlayer(getUuid()).isOnline();
+        return !InvseePlugin.getInstance().getServer().getOfflinePlayer(getUniqueIdOfObservedPlayer()).isOnline();
     }
 
     default Optional<Player> getPlayerOffline(OfflinePlayer player) {

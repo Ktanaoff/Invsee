@@ -27,7 +27,7 @@ public class InvseeSession implements Session {
             .expireAfterAccess(10, TimeUnit.SECONDS)
             .build();
 
-    public InvseeSession(OfflinePlayer offlinePlayer) {
+    public InvseeSession(OfflinePlayer offlinePlayer, UUID subscriber) {
         this.uuid = offlinePlayer.getUniqueId();
         this.subscribers = new HashSet<>();
 
@@ -38,16 +38,12 @@ public class InvseeSession implements Session {
             this.inventory = InvseePlugin.getInstance().getServer().createInventory(null, 45, text(name).append(text("'s inventory")));
         }
 
-        updateSpectatorInventory();
-    }
-
-    public InvseeSession(OfflinePlayer player, UUID subscriber) {
-        this(player);
+        updateSubscriberInventory();
         addSubscriber(subscriber);
     }
 
     @Override
-    public UUID getUuid() {
+    public UUID getUniqueIdOfObservedPlayer() {
         return uuid;
     }
 
@@ -77,14 +73,13 @@ public class InvseeSession implements Session {
     }
 
     @Override
-    public void updateSpectatorInventory() {
+    public void updateSubscriberInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             PlayerInventory playerInv = getPlayerInventory(offlinePlayer);
             if (playerInv == null) {
                 return;
             }
-            System.out.println(playerInv.getSize());
             for (int i = 0; i < 41; i++) {
                 inventory.setItem(i, playerInv.getItem(i));
             }
@@ -97,14 +92,13 @@ public class InvseeSession implements Session {
     }
 
     @Override
-    public void updatePlayerInventory() {
+    public void updateObservedInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(uuid);
             PlayerInventory playerInventory = getPlayerInventory(offlinePlayer);
             if (playerInventory == null) {
                 return;
             }
-            System.out.println(playerInventory.getSize());
             for (int i = 0; i <= playerInventory.getSize(); i++) {
                 playerInventory.setItem(i, this.inventory.getItem(i));
             }

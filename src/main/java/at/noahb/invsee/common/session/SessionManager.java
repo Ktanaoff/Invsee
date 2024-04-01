@@ -23,7 +23,7 @@ public abstract class SessionManager {
 
     public void addSubscriberToSession(OfflinePlayer player, UUID subscriber) {
         sessions.stream()
-                .filter(filterSession -> player.getUniqueId().equals(filterSession.getUuid()))
+                .filter(filterSession -> player.getUniqueId().equals(filterSession.getUniqueIdOfObservedPlayer()))
                 .findFirst()
                 .ifPresentOrElse(session -> session.addSubscriber(subscriber), () -> createSession(player, subscriber));
     }
@@ -43,11 +43,11 @@ public abstract class SessionManager {
 
     public void updateContent(Player player) {
         Optional<? extends Session> optionalSession = sessions.stream()
-                .filter(session -> session.getUuid().equals(player.getUniqueId()))
+                .filter(session -> session.getUniqueIdOfObservedPlayer().equals(player.getUniqueId()))
                 .findFirst();
 
         if (optionalSession.isPresent()) {
-            optionalSession.get().updateSpectatorInventory();
+            optionalSession.get().updateSubscriberInventory();
             return;
         }
 
@@ -55,7 +55,7 @@ public abstract class SessionManager {
                 .filter(session -> session.hasSubscriber(player.getUniqueId()))
                 .findFirst();
 
-        optionalSession.ifPresent(Session::updatePlayerInventory);
+        optionalSession.ifPresent(Session::updateObservedInventory);
     }
 
     protected void addSession(Session session) {

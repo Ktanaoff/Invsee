@@ -29,7 +29,7 @@ public class EnderseeSession implements Session {
             .build();
     private final ReentrantLock lock = new ReentrantLock();
 
-    public EnderseeSession(OfflinePlayer offlinePlayer) {
+    public EnderseeSession(OfflinePlayer offlinePlayer, UUID subscriber) {
         this.uuid = offlinePlayer.getUniqueId();
         this.subscribers = new HashSet<>();
 
@@ -40,31 +40,8 @@ public class EnderseeSession implements Session {
             this.enderchest = InvseePlugin.getInstance().getServer().createInventory(null, 45, text(name).append(text("'s enderchest")));
         }
 
-        updateSpectatorInventory();
-    }
-
-    public EnderseeSession(OfflinePlayer player, UUID subscriber) {
-        this(player);
+        updateSubscriberInventory();
         addSubscriber(subscriber);
-    }
-
-    @Override
-    public UUID getUuid() {
-        return uuid;
-    }
-
-    @Override
-    public void updatePlayerInventory() {
-        update(() -> {
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
-            Inventory enderChest = getEnderChest(offlinePlayer);
-            if (enderChest == null) {
-                return;
-            }
-            for (int i = 0; i < InventoryType.ENDER_CHEST.getDefaultSize(); i++) {
-                enderChest.setItem(i, this.enderchest.getItem(i));
-            }
-        });
     }
 
     private Inventory getEnderChest(OfflinePlayer offline) {
@@ -77,7 +54,26 @@ public class EnderseeSession implements Session {
     }
 
     @Override
-    public void updateSpectatorInventory() {
+    public UUID getUniqueIdOfObservedPlayer() {
+        return uuid;
+    }
+
+    @Override
+    public void updateObservedInventory() {
+        update(() -> {
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            Inventory enderChest = getEnderChest(offlinePlayer);
+            if (enderChest == null) {
+                return;
+            }
+            for (int i = 0; i < InventoryType.ENDER_CHEST.getDefaultSize(); i++) {
+                enderChest.setItem(i, this.enderchest.getItem(i));
+            }
+        });
+    }
+
+    @Override
+    public void updateSubscriberInventory() {
         update(() -> {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             Inventory enderChest = getEnderChest(offlinePlayer);
