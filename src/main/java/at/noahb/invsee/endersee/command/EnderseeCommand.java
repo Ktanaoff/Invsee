@@ -1,53 +1,34 @@
 package at.noahb.invsee.endersee.command;
 
 import at.noahb.invsee.InvseePlugin;
-import net.kyori.adventure.text.Component;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.command.Command;
+import at.noahb.invsee.common.command.AbstractInvseeCommand;
+import at.noahb.invsee.common.session.SessionManager;
 import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public class EnderseeCommand extends Command {
-
-    protected final InvseePlugin instance;
+public class EnderseeCommand extends AbstractInvseeCommand {
 
     public EnderseeCommand(InvseePlugin instance) {
         super(
+                instance,
                 "endersee",
                 "Endersee command",
-                "/endersee player",
-                new ArrayList<>()
+                "/endersee <player>",
+                "invsee.invsee.command",
+                List.of("esee", "es", "ecsee")
         );
-        this.instance = instance;
-        setAliases(List.of("esee", "es", "ecsee"));
-        setPermission("invsee.invsee.command");
     }
 
     @Override
     public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-        if (args.length != 1) {
-            sender.sendMessage(Component.text("/endersee <player>"));
-            return true;
-        }
+        return super.execute(sender, commandLabel, args);
+    }
 
-        if (!(sender instanceof Player player)) {
-            sender.sendMessage("Command can only be executed by a player.");
-            return true;
-        }
-
-        if (!player.hasPermission("invsee.endersee.command")) {
-            sender.sendMessage("You don't have permissions to use that command");
-            return true;
-        }
-
-        OfflinePlayer other = instance.getServer().getOfflinePlayer(args[0]);
-        instance.getEnderseeSessionManager().addSubscriberToSession(other, player.getUniqueId());
-
-        return true;
+    @Override
+    protected SessionManager getSessionManager() {
+        return getInstance().getEnderseeSessionManager();
     }
 
 }
