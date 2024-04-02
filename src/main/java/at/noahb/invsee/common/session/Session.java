@@ -2,7 +2,6 @@ package at.noahb.invsee.common.session;
 
 import at.noahb.invsee.InvseePlugin;
 import com.mojang.authlib.GameProfile;
-import net.kyori.adventure.text.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
@@ -20,6 +19,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.locks.ReentrantLock;
 
+import static net.kyori.adventure.text.Component.text;
+
 public interface Session {
 
     default void addSubscriber(UUID subscriber) {
@@ -31,7 +32,7 @@ public interface Session {
         OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(getUniqueIdOfObservedPlayer());
         Optional<Player> other = getPlayerOffline(offlinePlayer);
         if (other.isEmpty()) {
-            player.sendMessage(Component.text("Could not find player with name ").append(Component.text(Objects.requireNonNull(offlinePlayer.getName(), "<null>"))));
+            player.sendMessage(text("Could not find player with name ").append(text(Objects.requireNonNull(offlinePlayer.getName(), "<null>"))));
         }
 
         getSubscribers().add(subscriber);

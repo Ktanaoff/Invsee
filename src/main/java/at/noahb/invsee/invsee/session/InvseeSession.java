@@ -4,10 +4,13 @@ import at.noahb.invsee.InvseePlugin;
 import at.noahb.invsee.common.session.Session;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.*;
@@ -15,6 +18,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static net.kyori.adventure.text.Component.text;
+import static net.kyori.adventure.text.format.NamedTextColor.GOLD;
+import static net.kyori.adventure.text.format.NamedTextColor.RED;
+import static net.kyori.adventure.text.format.TextDecoration.ITALIC;
 
 
 public class InvseeSession implements Session {
@@ -80,10 +86,20 @@ public class InvseeSession implements Session {
             if (playerInv == null) {
                 return;
             }
+
             for (int i = 0; i < 41; i++) {
                 inventory.setItem(i, playerInv.getItem(i));
             }
+            replaceEmptyPlaceholderSpots();
         });
+    }
+
+    private void replaceEmptyPlaceholderSpots() {
+        if (inventory.getItem(36) == null) getInventory().setItem(36, Placeholders.HELMET);
+        if (inventory.getItem(37) == null) getInventory().setItem(37, Placeholders.CHESTPLATE);
+        if (inventory.getItem(38) == null) getInventory().setItem(38, Placeholders.LEGGINGS);
+        if (inventory.getItem(39) == null) getInventory().setItem(39, Placeholders.BOOTS);
+        if (inventory.getItem(40) == null) getInventory().setItem(40, Placeholders.OFF_HAND);
     }
 
     @Override
@@ -102,6 +118,7 @@ public class InvseeSession implements Session {
             for (int i = 0; i <= playerInventory.getSize(); i++) {
                 playerInventory.setItem(i, this.inventory.getItem(i));
             }
+            replaceEmptyPlaceholderSpots();
         });
     }
 
@@ -131,6 +148,47 @@ public class InvseeSession implements Session {
     @Override
     public int hashCode() {
         return Objects.hash(uuid);
+    }
+
+    public static class Placeholders {
+        static final ItemStack HELMET = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        static final ItemStack CHESTPLATE = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        static final ItemStack LEGGINGS = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        static final ItemStack BOOTS = new ItemStack(Material.RED_STAINED_GLASS_PANE);
+        static final ItemStack OFF_HAND = new ItemStack(Material.BARRIER);
+        static final List<ItemStack> placeholders = List.of(HELMET, CHESTPLATE, LEGGINGS, BOOTS, OFF_HAND);
+
+        static {
+            List<Component> lore = List.of(text("empty", RED).decoration(ITALIC, false));
+            HELMET.editMeta(itemMeta -> {
+                itemMeta.displayName(text("Helmet slot", GOLD).decoration(ITALIC, false));
+                itemMeta.lore(lore);
+            });
+            CHESTPLATE.editMeta(itemMeta -> {
+                itemMeta.displayName(text("Chestplate slot", GOLD).decoration(ITALIC, false));
+                itemMeta.lore(lore);
+            });
+            LEGGINGS.editMeta(itemMeta -> {
+                itemMeta.displayName(text("Leggings slot", GOLD).decoration(ITALIC, false));
+                itemMeta.lore(lore);
+            });
+            BOOTS.editMeta(itemMeta -> {
+                itemMeta.displayName(text("Boots slot", GOLD).decoration(ITALIC, false));
+                itemMeta.lore(lore);
+            });
+            OFF_HAND.editMeta(itemMeta -> {
+                itemMeta.displayName(text("Off Hand", GOLD).decoration(ITALIC, false));
+                itemMeta.lore(lore);
+            });
+        }
+
+        public static boolean isOffHandPlaceholder(ItemStack itemStack) {
+            return OFF_HAND.equals(itemStack);
+        }
+
+        public static boolean contains(ItemStack itemStack) {
+            return placeholders.contains(Objects.requireNonNullElse(itemStack, ItemStack.empty()));
+        }
     }
 
 }
