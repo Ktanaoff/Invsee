@@ -2,6 +2,8 @@ package at.noahb.invsee.invsee.session;
 
 import at.noahb.invsee.InvseePlugin;
 import at.noahb.invsee.common.session.Session;
+import com.destroystokyo.paper.MaterialSetTag;
+import com.destroystokyo.paper.MaterialTags;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import net.kyori.adventure.text.Component;
@@ -95,10 +97,10 @@ public class InvseeSession implements Session {
     }
 
     private void replaceEmptyPlaceholderSpots() {
-        if (inventory.getItem(36) == null) getInventory().setItem(36, Placeholders.HELMET);
-        if (inventory.getItem(37) == null) getInventory().setItem(37, Placeholders.CHESTPLATE);
-        if (inventory.getItem(38) == null) getInventory().setItem(38, Placeholders.LEGGINGS);
-        if (inventory.getItem(39) == null) getInventory().setItem(39, Placeholders.BOOTS);
+        if (inventory.getItem(36) == null) getInventory().setItem(36, Placeholders.BOOTS);
+        if (inventory.getItem(37) == null) getInventory().setItem(37, Placeholders.LEGGINGS);
+        if (inventory.getItem(38) == null) getInventory().setItem(38, Placeholders.CHESTPLATE);
+        if (inventory.getItem(39) == null) getInventory().setItem(39, Placeholders.HELMET);
         if (inventory.getItem(40) == null) getInventory().setItem(40, Placeholders.OFF_HAND);
     }
 
@@ -115,9 +117,11 @@ public class InvseeSession implements Session {
             if (playerInventory == null) {
                 return;
             }
-            for (int i = 0; i <= playerInventory.getSize(); i++) {
+            for (int i = 0; i <= playerInventory.getSize() - 5; i++) {
+                if (Placeholders.contains(this.inventory.getItem(i))) continue;
                 playerInventory.setItem(i, this.inventory.getItem(i));
             }
+
             replaceEmptyPlaceholderSpots();
         });
     }
@@ -188,6 +192,24 @@ public class InvseeSession implements Session {
 
         public static boolean contains(ItemStack itemStack) {
             return placeholders.contains(Objects.requireNonNullElse(itemStack, ItemStack.empty()));
+        }
+    }
+
+    public enum ArmorSlot {
+        HELMET(MaterialTags.HELMETS),
+        CHESTPLATE(MaterialTags.CHESTPLATES),
+        LEGGINGS(MaterialTags.LEGGINGS),
+        BOOTS(MaterialTags.BOOTS);
+
+        private final MaterialSetTag tag;
+
+        ArmorSlot(MaterialSetTag tag) {
+            this.tag = tag;
+        }
+
+        public boolean checkIfItemFitsSlot(ItemStack itemStack) {
+            System.out.println("checking " + itemStack.getType() + " for " + name());
+            return tag.isTagged(itemStack);
         }
     }
 

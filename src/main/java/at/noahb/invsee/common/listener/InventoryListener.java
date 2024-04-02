@@ -24,10 +24,23 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
+        boolean setEmpty = false;
         if (InvseeSession.Placeholders.contains(event.getCurrentItem())) {
             if (MaterialTags.ARMOR.isTagged(event.getCursor()) || InvseeSession.Placeholders.isOffHandPlaceholder(event.getCurrentItem())) {
-                event.setCurrentItem(ItemStack.empty());
+                setEmpty = true;
             } else {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        if (event.getClickedInventory() != null && event.getClickedInventory().getSize() == 45 && event.getSlot() >= 36 && event.getSlot() < 40) {
+            if (!MaterialTags.ARMOR.isTagged(event.getCursor()) && !event.getCursor().isEmpty()) {
+                event.setCancelled(true);
+                return;
+            }
+
+            if (!InvseeSession.ArmorSlot.values()[39 - event.getSlot()].checkIfItemFitsSlot(event.getCursor()) && !event.getCursor().isEmpty()) {
                 event.setCancelled(true);
                 return;
             }
@@ -37,6 +50,7 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
             return;
         }
 
+        if (setEmpty) event.setCurrentItem(ItemStack.empty());
         handle(event.getWhoClicked());
     }
 

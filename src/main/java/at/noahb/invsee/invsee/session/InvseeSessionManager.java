@@ -17,7 +17,6 @@ public class InvseeSessionManager extends SessionManager {
         InvseeSession invseeSession = new InvseeSession(offlinePlayer, subscriber);
         addSession(invseeSession);
         return invseeSession;
-
     }
 
 }
