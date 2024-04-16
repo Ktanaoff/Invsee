@@ -37,7 +37,7 @@ public class EnderseeSession implements Session {
             this.enderchest = Bukkit.createInventory(player, InventoryType.ENDER_CHEST, player.name().append(text("'s enderchest")));
         } else {
             String name = offlinePlayer.getName() == null ? "unknown" : offlinePlayer.getName();
-            this.enderchest = InvseePlugin.getInstance().getServer().createInventory(null, 45, text(name).append(text("'s enderchest")));
+            this.enderchest = InvseePlugin.getInstance().getServer().createInventory(null, InventoryType.ENDER_CHEST, text(name).append(text("'s enderchest")));
         }
 
         updateSubscriberInventory();
