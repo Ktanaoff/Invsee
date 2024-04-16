@@ -62,7 +62,7 @@ public class InvseeSession implements Session {
 
     @Override
     public Inventory getInventory() {
-        return inventory;
+        return this.inventory;
     }
 
     private PlayerInventory getPlayerInventory(OfflinePlayer offlinePlayer) {
@@ -77,36 +77,41 @@ public class InvseeSession implements Session {
 
     @Override
     public void removeSubscriber(UUID subscriber) {
-        subscribers.remove(subscriber);
+        this.subscribers.remove(subscriber);
     }
 
     @Override
     public void updateSubscriberInventory() {
         update(() -> {
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(this.uuid);
             PlayerInventory playerInv = getPlayerInventory(offlinePlayer);
+
             if (playerInv == null) {
                 return;
             }
 
             for (int i = 0; i < 41; i++) {
-                inventory.setItem(i, playerInv.getItem(i));
+                this.inventory.setItem(i, playerInv.getItem(i));
+            }
+            if (offlinePlayer instanceof Player player) {
+                this.inventory.setItem(41, player.getItemOnCursor());
             }
             replaceEmptyPlaceholderSpots();
         });
     }
 
     private void replaceEmptyPlaceholderSpots() {
-        if (inventory.getItem(36) == null) getInventory().setItem(36, Placeholders.BOOTS);
-        if (inventory.getItem(37) == null) getInventory().setItem(37, Placeholders.LEGGINGS);
-        if (inventory.getItem(38) == null) getInventory().setItem(38, Placeholders.CHESTPLATE);
-        if (inventory.getItem(39) == null) getInventory().setItem(39, Placeholders.HELMET);
-        if (inventory.getItem(40) == null) getInventory().setItem(40, Placeholders.OFF_HAND);
+        if (this.inventory.getItem(36) == null) this.inventory.setItem(36, Placeholders.BOOTS);
+        if (this.inventory.getItem(37) == null) this.inventory.setItem(37, Placeholders.LEGGINGS);
+        if (this.inventory.getItem(38) == null) this.inventory.setItem(38, Placeholders.CHESTPLATE);
+        if (this.inventory.getItem(39) == null) this.inventory.setItem(39, Placeholders.HELMET);
+        if (this.inventory.getItem(40) == null) this.inventory.setItem(40, Placeholders.OFF_HAND);
+        if (this.inventory.getItem(41) == null) this.inventory.setItem(41, Placeholders.CURSOR);
     }
 
     @Override
     public boolean hasSubscriber(UUID uuid) {
-        return subscribers.contains(uuid);
+        return this.subscribers.contains(uuid);
     }
 
     @Override
@@ -117,9 +122,13 @@ public class InvseeSession implements Session {
             if (playerInventory == null) {
                 return;
             }
-            for (int i = 0; i <= playerInventory.getSize() - 5; i++) {
+            for (int i = 0; i < playerInventory.getSize(); i++) {
                 if (Placeholders.contains(this.inventory.getItem(i))) continue;
                 playerInventory.setItem(i, this.inventory.getItem(i));
+            }
+
+            if (!Placeholders.contains(this.inventory.getItem(41)) && offlinePlayer instanceof Player player) {
+                player.setItemOnCursor(this.inventory.getItem(41));
             }
 
             replaceEmptyPlaceholderSpots();
@@ -128,17 +137,17 @@ public class InvseeSession implements Session {
 
     @Override
     public ReentrantLock getLock() {
-        return lock;
+        return this.lock;
     }
 
     @Override
     public void cache(Player player) {
-        playerCache.put(this.uuid, player);
+        this.playerCache.put(this.uuid, player);
     }
 
     @Override
     public Player getCachedPlayer() {
-        return playerCache.getIfPresent(this.uuid);
+        return this.playerCache.getIfPresent(this.uuid);
     }
 
     @Override
@@ -160,7 +169,8 @@ public class InvseeSession implements Session {
         static final ItemStack LEGGINGS = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         static final ItemStack BOOTS = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         static final ItemStack OFF_HAND = new ItemStack(Material.BARRIER);
-        static final List<ItemStack> placeholders = List.of(HELMET, CHESTPLATE, LEGGINGS, BOOTS, OFF_HAND);
+        static final ItemStack CURSOR = new ItemStack(Material.BARRIER);
+        static final List<ItemStack> placeholders = List.of(HELMET, CHESTPLATE, LEGGINGS, BOOTS, OFF_HAND, CURSOR);
 
         static {
             List<Component> lore = List.of(text("empty", RED).decoration(ITALIC, false));
@@ -184,6 +194,11 @@ public class InvseeSession implements Session {
                 itemMeta.displayName(text("Off Hand", GOLD).decoration(ITALIC, false));
                 itemMeta.lore(lore);
             });
+            CURSOR.editMeta(itemMeta -> {
+                itemMeta.displayName(text("Cursor", GOLD).decoration(ITALIC, false));
+                itemMeta.lore(lore);
+            });
+
         }
 
         public static boolean isOffHandPlaceholder(ItemStack itemStack) {
@@ -192,6 +207,10 @@ public class InvseeSession implements Session {
 
         public static boolean contains(ItemStack itemStack) {
             return placeholders.contains(Objects.requireNonNullElse(itemStack, ItemStack.empty()));
+        }
+
+        public static boolean isCursorPlaceholder(ItemStack itemStack) {
+            return CURSOR.equals(itemStack);
         }
     }
 

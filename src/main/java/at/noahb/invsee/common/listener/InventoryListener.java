@@ -20,12 +20,17 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
     public void onInventoryClose(InventoryCloseEvent event) {
         instance.getInvseeSessionManager().removeSubscriberFromSession(event.getPlayer());
         instance.getEnderseeSessionManager().removeSubscriberFromSession(event.getPlayer());
+        handle(event.getPlayer());
     }
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         boolean setEmpty = false;
         if (InvseeSession.Placeholders.contains(event.getCurrentItem())) {
+            if (InvseeSession.Placeholders.isCursorPlaceholder(event.getCurrentItem()) || InvseeSession.Placeholders.isCursorPlaceholder(event.getCursor())) {
+                event.setCancelled(true);
+                return;
+            }
             if (MaterialTags.ARMOR.isTagged(event.getCursor()) || InvseeSession.Placeholders.isOffHandPlaceholder(event.getCurrentItem())) {
                 setEmpty = true;
             } else {
