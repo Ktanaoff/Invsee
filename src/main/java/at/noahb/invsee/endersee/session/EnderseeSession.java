@@ -55,13 +55,13 @@ public class EnderseeSession implements Session {
 
     @Override
     public UUID getUniqueIdOfObservedPlayer() {
-        return uuid;
+        return this.uuid;
     }
 
     @Override
     public void updateObservedInventory() {
         update(() -> {
-            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(this.uuid);
             Inventory enderChest = getEnderChest(offlinePlayer);
             if (enderChest == null) {
                 return;
@@ -79,44 +79,44 @@ public class EnderseeSession implements Session {
             Inventory enderChest = getEnderChest(offlinePlayer);
 
             for (int i = 0; i < InventoryType.ENDER_CHEST.getDefaultSize(); i++) {
-                enderchest.setItem(i, enderChest.getItem(i));
+                this.enderchest.setItem(i, enderChest.getItem(i));
             }
         });
     }
 
     @Override
     public Set<UUID> getSubscribers() {
-        return subscribers;
+        return this.subscribers;
     }
 
     @Override
     public Inventory getInventory() {
-        return enderchest;
+        return this.enderchest;
     }
 
     @Override
     public void removeSubscriber(UUID subscriber) {
-        subscribers.remove(subscriber);
+        this.subscribers.remove(subscriber);
     }
 
     @Override
     public boolean hasSubscriber(UUID subscriber) {
-        return subscribers.contains(subscriber);
+        return this.subscribers.contains(subscriber);
     }
 
     @Override
     public ReentrantLock getLock() {
-        return lock;
+        return this.lock;
     }
 
     @Override
     public void cache(Player player) {
-        playerCache.put(this.uuid, player);
+        this.playerCache.put(this.uuid, player);
     }
 
     @Override
     public Player getCachedPlayer() {
-        return playerCache.getIfPresent(this.uuid);
+        return this.playerCache.getIfPresent(this.uuid);
     }
 
     @Override
