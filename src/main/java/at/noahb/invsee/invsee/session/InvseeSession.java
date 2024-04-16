@@ -227,7 +227,6 @@ public class InvseeSession implements Session {
         }
 
         public boolean checkIfItemFitsSlot(ItemStack itemStack) {
-            System.out.println("checking " + itemStack.getType() + " for " + name());
             return tag.isTagged(itemStack);
         }
     }
