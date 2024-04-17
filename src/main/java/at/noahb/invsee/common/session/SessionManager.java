@@ -22,6 +22,9 @@ public abstract class SessionManager {
     }
 
     public void addSubscriberToSession(OfflinePlayer player, UUID subscriber) {
+        this.sessions.stream().filter(session -> session.getSubscribers().contains(subscriber))
+                .forEach(session -> session.removeSubscriber(subscriber));
+
         this.sessions.stream()
                 .filter(filterSession -> player.getUniqueId().equals(filterSession.getUniqueIdOfObservedPlayer()))
                 .findFirst()
@@ -60,6 +63,12 @@ public abstract class SessionManager {
 
     protected void addSession(Session session) {
         this.sessions.add(session);
+    }
+
+    public Optional<Session> getSessionForSubscriber(UUID subscriber) {
+        return sessions.stream()
+                .filter(session -> session.hasSubscriber(subscriber))
+                .findFirst();
     }
 
     protected abstract Session createSession(OfflinePlayer offlinePlayer, UUID subscriber);

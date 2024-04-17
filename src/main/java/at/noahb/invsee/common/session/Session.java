@@ -14,8 +14,6 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
-import javax.annotation.Nullable;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -31,8 +29,9 @@ public interface Session {
         Player player = InvseePlugin.getInstance().getServer().getPlayer(subscriber);
         if (player == null) return;
 
-        OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(getUniqueIdOfObservedPlayer());
-        Optional<Player> other = getPlayerOffline(player, offlinePlayer);
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(getUniqueIdOfObservedPlayer());
+
+        Optional<Player> other = getPlayerOffline(offlinePlayer);
         if (other.isEmpty()) {
             return;
         }
@@ -66,18 +65,6 @@ public interface Session {
     }
 
     default Optional<Player> getPlayerOffline(OfflinePlayer offlinePlayer) {
-        return getPlayerOffline(null, offlinePlayer);
-    }
-
-    default Optional<Player> getPlayerOffline(@Nullable Player player, OfflinePlayer offlinePlayer) {
-        if (!offlinePlayer.hasPlayedBefore() && !InvseePlugin.getInstance().getConfig().getBoolean("allow-lookup-of-unseen-players")) {
-            if (player != null) player.sendMessage(text("Player ", NamedTextColor.RED)
-                    //append player name or uniqueId if name is empty
-                    .append(text(Objects.requireNonNullElse(offlinePlayer.getName(), offlinePlayer.getUniqueId().toString())))
-                    .append(text(" has never played on this server.")));
-            return Optional.empty();
-        }
-
         Player cached = getCachedPlayer();
         if (cached != null) {
             return Optional.of(cached);
@@ -89,7 +76,6 @@ public interface Session {
         ServerLevel level = server.getLevel(Level.OVERWORLD);
         if (level == null) {
             InvseePlugin.getInstance().getComponentLogger().error(text("Unable to find overworld level", NamedTextColor.RED));
-            if (player != null) player.sendMessage(text("Unable to find overworld level", NamedTextColor.RED));
             return Optional.empty();
         }
 

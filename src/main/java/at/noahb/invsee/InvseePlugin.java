@@ -9,6 +9,7 @@ import at.noahb.invsee.invsee.session.InvseeSessionManager;
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
+import org.bukkit.permissions.Permission;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,6 +40,8 @@ public final class InvseePlugin extends JavaPlugin {
             this.luckPerms = provider.getProvider();
             new LuckPermsListener(this, this.luckPerms);
         }
+
+        getServer().getPluginManager().addPermission(new Permission("invsee.lookupneverseen"));
     }
 
     private void registerCommands() {

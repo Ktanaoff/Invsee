@@ -1,8 +1,10 @@
 package at.noahb.invsee.common.command;
 
+import at.noahb.invsee.Constants;
 import at.noahb.invsee.InvseePlugin;
 import at.noahb.invsee.common.session.SessionManager;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -31,18 +33,36 @@ public abstract class AbstractPluginCommand extends Command {
         }
 
         if (!(sender instanceof Player player)) {
-            sender.sendMessage("Command can only be executed by a player.");
+            sender.sendMessage(Component.text("Command can only be executed by a player.", NamedTextColor.RED));
             return true;
         }
 
         if (!player.hasPermission(Objects.requireNonNull(getPermission(), this::getCommandPermission))) {
-            sender.sendMessage("You don't have permissions to use that command");
+            sender.sendMessage(Component.text("You don't have permissions to use that command", NamedTextColor.RED));
             return true;
         }
 
         OfflinePlayer other = this.instance.getServer().getOfflinePlayer(args[0]);
-        getSessionManager().addSubscriberToSession(other, player.getUniqueId());
 
+        if (!other.hasPlayedBefore()) {
+            if (!InvseePlugin.getInstance().getConfig().getBoolean(Constants.LOOKUP_UNSEEN_CONFIG)) {
+                System.out.println("config");
+                player.sendMessage(Component.text("Player ", NamedTextColor.RED)
+                        .append(Component.text(Objects.requireNonNullElse(other.getName(), other.getUniqueId().toString())))
+                        .append(Component.text(" has never played on this server.")));
+                return true;
+            }
+
+            if (!player.hasPermission(Constants.LOOKUP_UNSEEN_PERMISSION)) {
+                player.getEffectivePermissions().forEach(permissionAttachmentInfo -> System.out.println(permissionAttachmentInfo.getPermission()));
+                player.sendMessage(Component.text("Player ", NamedTextColor.RED)
+                        .append(Component.text(Objects.requireNonNullElse(other.getName(), other.getUniqueId().toString())))
+                        .append(Component.text(" has never played on this server.")));
+                return true;
+            }
+        }
+
+        getSessionManager().addSubscriberToSession(other, player.getUniqueId());
         return true;
     }
 
