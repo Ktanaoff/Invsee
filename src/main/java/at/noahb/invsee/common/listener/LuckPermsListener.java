@@ -25,15 +25,15 @@ public class LuckPermsListener {
         if (!nodeRemoveEvent.isUser()) {
             return;
         }
-        OfflinePlayer offlinePlayer = instance.getServer().getOfflinePlayer(((User) nodeRemoveEvent.getTarget()).getUniqueId());
+        OfflinePlayer offlinePlayer = this.instance.getServer().getOfflinePlayer(((User) nodeRemoveEvent.getTarget()).getUniqueId());
         if (!(offlinePlayer instanceof Player player)) {
             return;
         }
 
-        if (Objects.equals(instance.getInvseeCommand().getPermission(), nodeRemoveEvent.getNode().getKey())) {
-            instance.getInvseeSessionManager().removeSubscriberFromSession(player);
-        } else if (Objects.equals(instance.getEnderseeCommand().getPermission(), nodeRemoveEvent.getNode().getKey())) {
-            instance.getEnderseeSessionManager().removeSubscriberFromSession(player);
+        if (Objects.equals(this.instance.getInvseeCommand().getPermission(), nodeRemoveEvent.getNode().getKey())) {
+            this.instance.getInvseeSessionManager().removeSubscriberFromSession(player);
+        } else if (Objects.equals(this.instance.getEnderseeCommand().getPermission(), nodeRemoveEvent.getNode().getKey())) {
+            this.instance.getEnderseeSessionManager().removeSubscriberFromSession(player);
         }
     }
 }

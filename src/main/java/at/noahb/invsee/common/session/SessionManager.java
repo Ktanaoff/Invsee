@@ -22,27 +22,27 @@ public abstract class SessionManager {
     }
 
     public void addSubscriberToSession(OfflinePlayer player, UUID subscriber) {
-        sessions.stream()
+        this.sessions.stream()
                 .filter(filterSession -> player.getUniqueId().equals(filterSession.getUniqueIdOfObservedPlayer()))
                 .findFirst()
                 .ifPresentOrElse(session -> session.addSubscriber(subscriber), () -> createSession(player, subscriber));
     }
 
     public void removeSubscriberFromSession(@NotNull HumanEntity subscriber) {
-        Optional<? extends Session> first = sessions.stream().filter(session -> session.getSubscribers().contains(subscriber.getUniqueId())).findFirst();
+        Optional<? extends Session> first = this.sessions.stream().filter(session -> session.getSubscribers().contains(subscriber.getUniqueId())).findFirst();
 
         first.ifPresent(session -> {
             session.removeSubscriber(subscriber.getUniqueId());
             if (session.getSubscribers().isEmpty()) {
-                sessions.remove(session);
+                this.sessions.remove(session);
             }
-            subscriber.getScheduler().run(instance, scheduledTask -> subscriber.closeInventory(InventoryCloseEvent.Reason.PLUGIN), null);
+            subscriber.getScheduler().run(this.instance, scheduledTask -> subscriber.closeInventory(InventoryCloseEvent.Reason.PLUGIN), null);
         });
 
     }
 
     public void updateContent(Player player) {
-        Optional<? extends Session> optionalSession = sessions.stream()
+        Optional<? extends Session> optionalSession = this.sessions.stream()
                 .filter(session -> session.getUniqueIdOfObservedPlayer().equals(player.getUniqueId()))
                 .findFirst();
 
@@ -51,7 +51,7 @@ public abstract class SessionManager {
             return;
         }
 
-        optionalSession = sessions.stream()
+        optionalSession = this.sessions.stream()
                 .filter(session -> session.hasSubscriber(player.getUniqueId()))
                 .findFirst();
 
@@ -59,7 +59,7 @@ public abstract class SessionManager {
     }
 
     protected void addSession(Session session) {
-        sessions.add(session);
+        this.sessions.add(session);
     }
 
     protected abstract Session createSession(OfflinePlayer offlinePlayer, UUID subscriber);

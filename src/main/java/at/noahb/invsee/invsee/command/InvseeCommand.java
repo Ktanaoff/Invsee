@@ -30,7 +30,7 @@ public class InvseeCommand extends AbstractPluginCommand {
 
     @Override
     protected String getCommandPermission() {
-        return PERMISSION;
+        return InvseeCommand.PERMISSION;
     }
 
     @Override

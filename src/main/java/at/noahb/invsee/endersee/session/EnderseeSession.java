@@ -78,6 +78,10 @@ public class EnderseeSession implements Session {
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(uuid);
             Inventory enderChest = getEnderChest(offlinePlayer);
 
+            if (enderChest == null) {
+                return;
+            }
+
             for (int i = 0; i < InventoryType.ENDER_CHEST.getDefaultSize(); i++) {
                 this.enderchest.setItem(i, enderChest.getItem(i));
             }

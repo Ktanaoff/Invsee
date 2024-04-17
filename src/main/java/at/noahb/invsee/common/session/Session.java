@@ -2,6 +2,7 @@ package at.noahb.invsee.common.session;
 
 import at.noahb.invsee.InvseePlugin;
 import com.mojang.authlib.GameProfile;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ClientInformation;
 import net.minecraft.server.level.ServerLevel;
@@ -13,6 +14,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftServer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 
+import javax.annotation.Nullable;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -30,14 +32,15 @@ public interface Session {
         if (player == null) return;
 
         OfflinePlayer offlinePlayer = InvseePlugin.getInstance().getServer().getOfflinePlayer(getUniqueIdOfObservedPlayer());
-        Optional<Player> other = getPlayerOffline(offlinePlayer);
+        Optional<Player> other = getPlayerOffline(player, offlinePlayer);
         if (other.isEmpty()) {
-            player.sendMessage(text("Could not find player with name ").append(text(Objects.requireNonNull(offlinePlayer.getName(), "<null>"))));
+            return;
         }
 
         getSubscribers().add(subscriber);
         player.getScheduler().run(InvseePlugin.getInstance(), scheduledTask -> player.openInventory(getInventory()), null);
     }
+
 
     default void save() {
         Player cachedPlayer = getCachedPlayer();
@@ -62,22 +65,35 @@ public interface Session {
         return !InvseePlugin.getInstance().getServer().getOfflinePlayer(getUniqueIdOfObservedPlayer()).isOnline();
     }
 
-    default Optional<Player> getPlayerOffline(OfflinePlayer player) {
+    default Optional<Player> getPlayerOffline(OfflinePlayer offlinePlayer) {
+        return getPlayerOffline(null, offlinePlayer);
+    }
+
+    default Optional<Player> getPlayerOffline(@Nullable Player player, OfflinePlayer offlinePlayer) {
+        if (!offlinePlayer.hasPlayedBefore() && !InvseePlugin.getInstance().getConfig().getBoolean("allow-lookup-of-unseen-players")) {
+            if (player != null) player.sendMessage(text("Player ", NamedTextColor.RED)
+                    //append player name or uniqueId if name is empty
+                    .append(text(Objects.requireNonNullElse(offlinePlayer.getName(), offlinePlayer.getUniqueId().toString())))
+                    .append(text(" has never played on this server.")));
+            return Optional.empty();
+        }
+
         Player cached = getCachedPlayer();
         if (cached != null) {
             return Optional.of(cached);
         }
-        GameProfile profile = new GameProfile(player.getUniqueId(),
-                player.getName() != null ? player.getName() : player.getUniqueId().toString());
+
+        GameProfile profile = new GameProfile(offlinePlayer.getUniqueId(),
+                offlinePlayer.getName() != null ? offlinePlayer.getName() : offlinePlayer.getUniqueId().toString());
         MinecraftServer server = ((CraftServer) Bukkit.getServer()).getServer();
         ServerLevel level = server.getLevel(Level.OVERWORLD);
-
         if (level == null) {
+            InvseePlugin.getInstance().getComponentLogger().error(text("Unable to find overworld level", NamedTextColor.RED));
+            if (player != null) player.sendMessage(text("Unable to find overworld level", NamedTextColor.RED));
             return Optional.empty();
         }
 
         ServerPlayer serverPlayer = new ServerPlayer(server, level, profile, ClientInformation.createDefault());
-
         Player target = serverPlayer.getBukkitEntity();
         target.loadData();
         cache(target);

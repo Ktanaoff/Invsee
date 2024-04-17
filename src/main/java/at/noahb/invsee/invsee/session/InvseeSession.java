@@ -52,12 +52,12 @@ public class InvseeSession implements Session {
 
     @Override
     public UUID getUniqueIdOfObservedPlayer() {
-        return uuid;
+        return this.uuid;
     }
 
     @Override
     public Set<UUID> getSubscribers() {
-        return subscribers;
+        return this.subscribers;
     }
 
     @Override
@@ -163,6 +163,23 @@ public class InvseeSession implements Session {
         return Objects.hash(uuid);
     }
 
+    public enum ArmorSlot {
+        HELMET(MaterialTags.HELMETS),
+        CHESTPLATE(MaterialTags.CHESTPLATES),
+        LEGGINGS(MaterialTags.LEGGINGS),
+        BOOTS(MaterialTags.BOOTS);
+
+        private final MaterialSetTag tag;
+
+        ArmorSlot(MaterialSetTag tag) {
+            this.tag = tag;
+        }
+
+        public boolean checkIfItemFitsSlot(ItemStack itemStack) {
+            return this.tag.isTagged(itemStack);
+        }
+    }
+
     public static class Placeholders {
         static final ItemStack HELMET = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         static final ItemStack CHESTPLATE = new ItemStack(Material.RED_STAINED_GLASS_PANE);
@@ -211,23 +228,6 @@ public class InvseeSession implements Session {
 
         public static boolean isCursorPlaceholder(ItemStack itemStack) {
             return CURSOR.equals(itemStack);
-        }
-    }
-
-    public enum ArmorSlot {
-        HELMET(MaterialTags.HELMETS),
-        CHESTPLATE(MaterialTags.CHESTPLATES),
-        LEGGINGS(MaterialTags.LEGGINGS),
-        BOOTS(MaterialTags.BOOTS);
-
-        private final MaterialSetTag tag;
-
-        ArmorSlot(MaterialSetTag tag) {
-            this.tag = tag;
-        }
-
-        public boolean checkIfItemFitsSlot(ItemStack itemStack) {
-            return tag.isTagged(itemStack);
         }
     }
 

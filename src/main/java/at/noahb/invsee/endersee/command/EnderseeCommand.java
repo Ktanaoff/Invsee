@@ -30,7 +30,7 @@ public class EnderseeCommand extends AbstractPluginCommand {
 
     @Override
     protected String getCommandPermission() {
-        return PERMISSION;
+        return EnderseeCommand.PERMISSION;
     }
 
     @Override

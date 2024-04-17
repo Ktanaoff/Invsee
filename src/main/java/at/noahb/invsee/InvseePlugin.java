@@ -27,40 +27,40 @@ public final class InvseePlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
+        saveDefaultConfig();
         instance = this;
-        invseeSessionManager = new InvseeSessionManager(instance);
-        enderseeSessionManager = new EnderseeSessionManager(instance);
+        this.invseeSessionManager = new InvseeSessionManager(instance);
+        this.enderseeSessionManager = new EnderseeSessionManager(instance);
         registerCommands();
         getServer().getPluginManager().registerEvents(new InventoryListener(instance), this);
 
         RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {
-            luckPerms = provider.getProvider();
+            this.luckPerms = provider.getProvider();
+            new LuckPermsListener(this, this.luckPerms);
         }
-
-        new LuckPermsListener(this, luckPerms);
     }
 
     private void registerCommands() {
-        invseeCommand = new InvseeCommand(this);
+        this.invseeCommand = new InvseeCommand(this);
         getServer().getCommandMap().register("invsee", invseeCommand);
-        enderseeCommand = new EnderseeCommand(this);
+        this.enderseeCommand = new EnderseeCommand(this);
         getServer().getCommandMap().register("endersee", enderseeCommand);
     }
 
     public InvseeSessionManager getInvseeSessionManager() {
-        return invseeSessionManager;
+        return this.invseeSessionManager;
     }
 
     public EnderseeSessionManager getEnderseeSessionManager() {
-        return enderseeSessionManager;
+        return this.enderseeSessionManager;
     }
 
     public Command getEnderseeCommand() {
-        return enderseeCommand;
+        return this.enderseeCommand;
     }
 
     public Command getInvseeCommand() {
-        return invseeCommand;
+        return this.invseeCommand;
     }
 }

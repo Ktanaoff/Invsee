@@ -40,14 +40,14 @@ public abstract class AbstractPluginCommand extends Command {
             return true;
         }
 
-        OfflinePlayer other = instance.getServer().getOfflinePlayer(args[0]);
+        OfflinePlayer other = this.instance.getServer().getOfflinePlayer(args[0]);
         getSessionManager().addSubscriberToSession(other, player.getUniqueId());
 
         return true;
     }
 
     protected InvseePlugin getInstance() {
-        return instance;
+        return this.instance;
     }
 
     protected abstract String getCommandPermission();
