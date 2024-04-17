@@ -46,7 +46,6 @@ public abstract class AbstractPluginCommand extends Command {
 
         if (!other.hasPlayedBefore()) {
             if (!InvseePlugin.getInstance().getConfig().getBoolean(Constants.LOOKUP_UNSEEN_CONFIG)) {
-                System.out.println("config");
                 player.sendMessage(Component.text("Player ", NamedTextColor.RED)
                         .append(Component.text(Objects.requireNonNullElse(other.getName(), other.getUniqueId().toString())))
                         .append(Component.text(" has never played on this server.")));
@@ -54,7 +53,6 @@ public abstract class AbstractPluginCommand extends Command {
             }
 
             if (!player.hasPermission(Constants.LOOKUP_UNSEEN_PERMISSION)) {
-                player.getEffectivePermissions().forEach(permissionAttachmentInfo -> System.out.println(permissionAttachmentInfo.getPermission()));
                 player.sendMessage(Component.text("Player ", NamedTextColor.RED)
                         .append(Component.text(Objects.requireNonNullElse(other.getName(), other.getUniqueId().toString())))
                         .append(Component.text(" has never played on this server.")));
