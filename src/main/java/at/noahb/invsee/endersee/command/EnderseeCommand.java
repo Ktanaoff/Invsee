@@ -3,8 +3,6 @@ package at.noahb.invsee.endersee.command;
 import at.noahb.invsee.InvseePlugin;
 import at.noahb.invsee.common.command.AbstractPluginCommand;
 import at.noahb.invsee.common.session.SessionManager;
-import org.bukkit.command.CommandSender;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
@@ -21,11 +19,6 @@ public class EnderseeCommand extends AbstractPluginCommand {
                 PERMISSION,
                 List.of("esee", "es", "ecsee")
         );
-    }
-
-    @Override
-    public boolean execute(@NotNull CommandSender sender, @NotNull String commandLabel, @NotNull String[] args) {
-        return super.execute(sender, commandLabel, args);
     }
 
     @Override

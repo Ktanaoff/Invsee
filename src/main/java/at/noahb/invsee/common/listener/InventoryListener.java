@@ -26,6 +26,12 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
         boolean setEmpty = false;
+
+        if (event.getClickedInventory() != null && event.getClickedInventory().getSize() == 45 && event.getSlot() > 41) {
+            event.setCancelled(true);
+            return;
+        }
+
         if (InvseeSession.Placeholders.contains(event.getCurrentItem())) {
             if (InvseeSession.Placeholders.isCursorPlaceholder(event.getCurrentItem()) || InvseeSession.Placeholders.isCursorPlaceholder(event.getCursor())) {
                 event.setCancelled(true);

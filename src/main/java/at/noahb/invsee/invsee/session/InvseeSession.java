@@ -107,6 +107,9 @@ public class InvseeSession implements Session {
         if (this.inventory.getItem(39) == null) this.inventory.setItem(39, Placeholders.HELMET);
         if (this.inventory.getItem(40) == null) this.inventory.setItem(40, Placeholders.OFF_HAND);
         if (this.inventory.getItem(41) == null) this.inventory.setItem(41, Placeholders.CURSOR);
+        for (int i = 42; i < 45; i++) {
+            if (this.inventory.getItem(i) == null) this.inventory.setItem(i, Placeholders.NO_USAGE);
+        }
     }
 
     @Override
@@ -187,7 +190,8 @@ public class InvseeSession implements Session {
         static final ItemStack BOOTS = new ItemStack(Material.RED_STAINED_GLASS_PANE);
         static final ItemStack OFF_HAND = new ItemStack(Material.BARRIER);
         static final ItemStack CURSOR = new ItemStack(Material.BARRIER);
-        static final List<ItemStack> placeholders = List.of(HELMET, CHESTPLATE, LEGGINGS, BOOTS, OFF_HAND, CURSOR);
+        static final ItemStack NO_USAGE = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
+        static final List<ItemStack> placeholders = List.of(HELMET, CHESTPLATE, LEGGINGS, BOOTS, OFF_HAND, CURSOR, NO_USAGE);
 
         static {
             List<Component> lore = List.of(text("empty", RED).decoration(ITALIC, false));
@@ -215,6 +219,7 @@ public class InvseeSession implements Session {
                 itemMeta.displayName(text("Cursor", GOLD).decoration(ITALIC, false));
                 itemMeta.lore(lore);
             });
+            NO_USAGE.editMeta(itemMeta -> itemMeta.displayName(Component.empty()));
 
         }
 
