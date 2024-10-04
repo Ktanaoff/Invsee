@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryAction;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.inventory.ItemStack;
 
 public record InventoryListener(InvseePlugin instance) implements Listener {
@@ -32,7 +33,7 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
             return;
         }
 
-        if (InvseeSession.Placeholders.contains(event.getCurrentItem())) {
+        if (InvseeSession.Placeholders.isPlaceholder(event.getCurrentItem())) {
             if (InvseeSession.Placeholders.isCursorPlaceholder(event.getCurrentItem()) || InvseeSession.Placeholders.isCursorPlaceholder(event.getCursor())) {
                 event.setCancelled(true);
                 return;
@@ -72,11 +73,16 @@ public record InventoryListener(InvseePlugin instance) implements Listener {
 
     @EventHandler
     public void onDrag(InventoryDragEvent event) {
-        if (InvseeSession.Placeholders.contains(event.getOldCursor())) {
+        if (InvseeSession.Placeholders.isPlaceholder(event.getOldCursor())) {
             event.setCancelled(true);
             return;
         }
         handle(event.getWhoClicked());
+    }
+
+    @EventHandler
+    public void onDrop(PlayerDropItemEvent event) {
+        handle(event.getPlayer());
     }
 
     private void handle(LivingEntity entity) {

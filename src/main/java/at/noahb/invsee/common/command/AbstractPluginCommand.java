@@ -47,6 +47,7 @@ public abstract class AbstractPluginCommand extends Command {
 
         if (player.getUniqueId().equals(other.getUniqueId())) {
             player.sendMessage(text("You cannot view your own inventory.", RED));
+            return true;
         }
 
         if (!other.isOnline() && !other.hasPlayedBefore()) {

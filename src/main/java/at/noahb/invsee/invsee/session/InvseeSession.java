@@ -9,11 +9,13 @@ import com.google.common.cache.CacheBuilder;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -126,11 +128,11 @@ public class InvseeSession implements Session {
                 return;
             }
             for (int i = 0; i < playerInventory.getSize(); i++) {
-                if (Placeholders.contains(this.inventory.getItem(i))) continue;
+                if (Placeholders.isPlaceholder(this.inventory.getItem(i))) continue;
                 playerInventory.setItem(i, this.inventory.getItem(i));
             }
 
-            if (!Placeholders.contains(this.inventory.getItem(41)) && offlinePlayer instanceof Player player) {
+            if (!Placeholders.isPlaceholder(this.inventory.getItem(41)) && offlinePlayer instanceof Player player) {
                 player.setItemOnCursor(this.inventory.getItem(41));
             }
 
@@ -191,48 +193,60 @@ public class InvseeSession implements Session {
         static final ItemStack OFF_HAND = new ItemStack(Material.BARRIER);
         static final ItemStack CURSOR = new ItemStack(Material.BARRIER);
         static final ItemStack NO_USAGE = new ItemStack(Material.LIGHT_GRAY_STAINED_GLASS_PANE);
-        static final List<ItemStack> placeholders = List.of(HELMET, CHESTPLATE, LEGGINGS, BOOTS, OFF_HAND, CURSOR, NO_USAGE);
 
+        static final NamespacedKey OFF_HAND_KEY = new NamespacedKey(InvseePlugin.getInstance(), "offhand");
+        static final NamespacedKey CURSOR_KEY = new NamespacedKey(InvseePlugin.getInstance(), "cursor");
+        static final NamespacedKey INVSEE_KEY = new NamespacedKey(InvseePlugin.getInstance(), "invsee");
         static {
             List<Component> lore = List.of(text("empty", RED).decoration(ITALIC, false));
             HELMET.editMeta(itemMeta -> {
                 itemMeta.displayName(text("Helmet slot", GOLD).decoration(ITALIC, false));
                 itemMeta.lore(lore);
+                itemMeta.getPersistentDataContainer().set(INVSEE_KEY, PersistentDataType.BOOLEAN, true);
             });
             CHESTPLATE.editMeta(itemMeta -> {
                 itemMeta.displayName(text("Chestplate slot", GOLD).decoration(ITALIC, false));
                 itemMeta.lore(lore);
+                itemMeta.getPersistentDataContainer().set(INVSEE_KEY, PersistentDataType.BOOLEAN, true);
             });
             LEGGINGS.editMeta(itemMeta -> {
                 itemMeta.displayName(text("Leggings slot", GOLD).decoration(ITALIC, false));
                 itemMeta.lore(lore);
+                itemMeta.getPersistentDataContainer().set(INVSEE_KEY, PersistentDataType.BOOLEAN, true);
             });
             BOOTS.editMeta(itemMeta -> {
                 itemMeta.displayName(text("Boots slot", GOLD).decoration(ITALIC, false));
                 itemMeta.lore(lore);
+                itemMeta.getPersistentDataContainer().set(INVSEE_KEY, PersistentDataType.BOOLEAN, true);
             });
             OFF_HAND.editMeta(itemMeta -> {
                 itemMeta.displayName(text("Off Hand", GOLD).decoration(ITALIC, false));
                 itemMeta.lore(lore);
+                itemMeta.getPersistentDataContainer().set(INVSEE_KEY, PersistentDataType.BOOLEAN, true);
+                itemMeta.getPersistentDataContainer().set(OFF_HAND_KEY, PersistentDataType.BOOLEAN, true);
             });
             CURSOR.editMeta(itemMeta -> {
                 itemMeta.displayName(text("Cursor", GOLD).decoration(ITALIC, false));
                 itemMeta.lore(lore);
+                itemMeta.getPersistentDataContainer().set(INVSEE_KEY, PersistentDataType.BOOLEAN, true);
+                itemMeta.getPersistentDataContainer().set(CURSOR_KEY, PersistentDataType.BOOLEAN, true);
             });
-            NO_USAGE.editMeta(itemMeta -> itemMeta.displayName(Component.empty()));
-
+            NO_USAGE.editMeta(itemMeta -> {
+                itemMeta.displayName(Component.empty());
+                itemMeta.getPersistentDataContainer().set(INVSEE_KEY, PersistentDataType.BOOLEAN, true);
+            });
         }
 
         public static boolean isOffHandPlaceholder(ItemStack itemStack) {
-            return OFF_HAND.equals(itemStack);
-        }
-
-        public static boolean contains(ItemStack itemStack) {
-            return placeholders.contains(Objects.requireNonNullElse(itemStack, ItemStack.empty()));
+            return itemStack != null && itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(OFF_HAND_KEY, PersistentDataType.BOOLEAN);
         }
 
         public static boolean isCursorPlaceholder(ItemStack itemStack) {
-            return CURSOR.equals(itemStack);
+            return itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(CURSOR_KEY, PersistentDataType.BOOLEAN);
+        }
+
+        public static boolean isPlaceholder(ItemStack itemStack) {
+            return itemStack != null && itemStack.hasItemMeta() && itemStack.getItemMeta().getPersistentDataContainer().has(INVSEE_KEY, PersistentDataType.BOOLEAN);
         }
     }
 

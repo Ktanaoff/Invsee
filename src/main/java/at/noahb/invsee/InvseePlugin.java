@@ -41,7 +41,7 @@ public final class InvseePlugin extends JavaPlugin {
             new LuckPermsListener(this, this.luckPerms);
         }
 
-        getServer().getPluginManager().addPermission(new Permission("invsee.lookupneverseen"));
+        getServer().getPluginManager().addPermission(new Permission(Constants.LOOKUP_UNSEEN_PERMISSION));
     }
 
     private void registerCommands() {
