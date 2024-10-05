@@ -39,6 +39,8 @@ public final class InvseePlugin extends JavaPlugin {
         if (provider != null) {
             this.luckPerms = provider.getProvider();
             new LuckPermsListener(this, this.luckPerms);
+        } else {
+            getLogger().warning("LuckPerms not found. Some features might not work.");
         }
 
         getServer().getPluginManager().addPermission(new Permission(Constants.LOOKUP_UNSEEN_PERMISSION));
